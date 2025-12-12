@@ -7,4 +7,6 @@ databaseChangeLog:
       file: classpath:db/changelog/changesets/003-create-payment.xml
   - include:
       file: classpath:db/changelog/changesets/004-create-document.xml
+  - include:
+      file: classpath:db/changelog/changesets/005-create-credit-analysis.xml
 
