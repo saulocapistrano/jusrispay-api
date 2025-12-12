@@ -1,9 +1,9 @@
 package br.com.jurispay.api.handler.exception;
 
 import br.com.jurispay.api.dto.common.ErrorResponse;
-import br.com.jurispay.application.user.domain.common.exception.BusinessException;
-import br.com.jurispay.application.user.domain.common.exception.NotFoundException;
-import br.com.jurispay.application.user.domain.common.exception.ValidationException;
+import br.com.jurispay.domain.common.exception.BusinessException;
+import br.com.jurispay.domain.common.exception.NotFoundException;
+import br.com.jurispay.domain.common.exception.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
