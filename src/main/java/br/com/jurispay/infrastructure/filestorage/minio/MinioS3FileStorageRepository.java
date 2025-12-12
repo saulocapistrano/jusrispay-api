@@ -110,9 +110,7 @@ public class MinioS3FileStorageRepository implements FileStorageRepository {
         }
     }
 
-    /**
-     * Método auxiliar para obter bytes do arquivo (usado no download).
-     */
+    @Override
     public byte[] getBytes(String bucket, String objectKey) {
         try {
             GetObjectRequest getRequest = GetObjectRequest.builder()
