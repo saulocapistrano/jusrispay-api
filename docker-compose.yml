@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: jurispay
       POSTGRES_PASSWORD: jurispay
     ports:
-      - "5432:5432"
+      - "15432:5432"
     volumes:
       - jurispay_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -22,8 +22,8 @@ services:
     image: minio/minio:latest
     container_name: jurispay-minio
     ports:
-      - "9000:9000"   # API S3
-      - "9001:9001"   # Console web
+      - "19000:9000"   # API S3
+      - "19001:9001"   # Console web
     environment:
       MINIO_ROOT_USER: jurispay
       MINIO_ROOT_PASSWORD: jurispay123
@@ -58,7 +58,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
     ports:
-      - "8080:8080"
+      - "18080:8080"
     depends_on:
       db:
         condition: service_healthy
