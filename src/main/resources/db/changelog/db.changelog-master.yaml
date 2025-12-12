@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - include:
+      file: classpath:db/changelog/changesets/001-create-customer.xml
+  - include:
+      file: classpath:db/changelog/changesets/002-create-loan.xml
+  - include:
+      file: classpath:db/changelog/changesets/003-create-payment.xml
+
