@@ -14,6 +14,7 @@ import br.com.jurispay.domain.document.model.DocumentType;
 import br.com.jurispay.domain.document.repository.DocumentRepository;
 import br.com.jurispay.infrastructure.filestorage.minio.MinioS3FileStorageRepository;
 import jakarta.validation.Valid;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -131,7 +132,9 @@ public class DocumentController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(document.getContentType()));
-        headers.setContentDispositionFormData("attachment", document.getOriginalFileName());
+        headers.setContentDisposition(ContentDisposition.attachment()
+                .filename(document.getOriginalFileName())
+                .build());
         headers.setContentLength(bytes.length);
 
         return ResponseEntity.ok()
