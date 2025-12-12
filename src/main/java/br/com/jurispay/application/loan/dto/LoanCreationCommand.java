@@ -1,0 +1,27 @@
+package br.com.jurispay.application.loan.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+
+/**
+ * DTO de comando para criação de novo empréstimo.
+ * Representa os dados necessários para criar um empréstimo.
+ */
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class LoanCreationCommand {
+
+    private Long customerId;
+    private BigDecimal valorSolicitado;
+    private Instant dataPrevistaDevolucao;
+}
+
