@@ -196,6 +196,39 @@ Após subir os containers, a API estará disponível em:
 - **Swagger UI:** http://localhost:18080/swagger-ui.html
 - **API Base:** http://localhost:18080/api
 
+### Smoke Test
+
+Após subir os containers, execute os seguintes testes para validar que tudo está funcionando:
+
+#### 1. Health Check da API
+
+```bash
+curl http://localhost:18080/actuator/health
+```
+
+Resposta esperada:
+```json
+{"status":"UP"}
+```
+
+#### 2. Swagger UI
+
+Acesse no navegador:
+```
+http://localhost:18080/swagger-ui/index.html
+```
+
+#### 3. MinIO Console
+
+Acesse no navegador:
+```
+http://localhost:19001
+```
+
+**Credenciais:**
+- Access Key: `jurispay`
+- Secret Key: `jurispay123`
+
 ### Estrutura Docker
 
 O projeto inclui:
