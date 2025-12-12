@@ -64,7 +64,7 @@ public class PaymentRepositoryAdapter implements PaymentRepository {
 
     @Override
     public List<Payment> findByLoanId(Long loanId) {
-        return springDataPaymentRepository.findByLoanId(loanId).stream()
+        return springDataPaymentRepository.findByLoan_Id(loanId).stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
