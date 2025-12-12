@@ -5,8 +5,74 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <!-- Changeset para criação da tabela loan -->
-    <!-- TODO: Implementar criação da tabela loan -->
+    <changeSet id="002-create-loan" author="jurispay">
+        <createTable tableName="loan">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="customer_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="valor_solicitado" type="NUMERIC(19,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="valor_devolucao_prevista" type="NUMERIC(19,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="taxa_juros" type="NUMERIC(5,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="multa_diaria" type="NUMERIC(19,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="data_liberacao" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="data_prevista_devolucao" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="data_criacao" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="data_atualizacao" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Foreign Key para customer -->
+        <addForeignKeyConstraint
+            baseTableName="loan"
+            baseColumnNames="customer_id"
+            referencedTableName="customer"
+            referencedColumnNames="id"
+            constraintName="fk_loan_customer"/>
+
+        <!-- Índice para customer_id (melhora performance de joins) -->
+        <createIndex
+            tableName="loan"
+            indexName="idx_loan_customer_id">
+            <column name="customer_id"/>
+        </createIndex>
+
+        <!-- Índice para status (útil para filtros) -->
+        <createIndex
+            tableName="loan"
+            indexName="idx_loan_status">
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
 
 </databaseChangeLog>
-
