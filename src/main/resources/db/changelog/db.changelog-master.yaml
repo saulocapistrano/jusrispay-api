@@ -5,4 +5,6 @@ databaseChangeLog:
       file: classpath:db/changelog/changesets/002-create-loan.xml
   - include:
       file: classpath:db/changelog/changesets/003-create-payment.xml
+  - include:
+      file: classpath:db/changelog/changesets/004-create-document.xml
 
