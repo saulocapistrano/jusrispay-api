@@ -5,8 +5,74 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <!-- Changeset para criação da tabela payment -->
-    <!-- TODO: Implementar criação da tabela payment -->
+    <changeSet id="003-create-payment" author="jurispay">
+        <createTable tableName="payment">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="loan_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="valor_pago" type="NUMERIC(19,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="data_pagamento" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="dias_atraso" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="multa_total" type="NUMERIC(19,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="valor_final_recebido" type="NUMERIC(19,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="roi_brl" type="NUMERIC(19,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="roi_percent" type="NUMERIC(5,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="metodo" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="data_criacao" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Foreign Key para loan -->
+        <addForeignKeyConstraint
+            baseTableName="payment"
+            baseColumnNames="loan_id"
+            referencedTableName="loan"
+            referencedColumnNames="id"
+            constraintName="fk_payment_loan"/>
+
+        <!-- Índice para loan_id (melhora performance de joins e buscas) -->
+        <createIndex
+            tableName="payment"
+            indexName="idx_payment_loan_id">
+            <column name="loan_id"/>
+        </createIndex>
+
+        <!-- Índice para data_pagamento (útil para relatórios e filtros temporais) -->
+        <createIndex
+            tableName="payment"
+            indexName="idx_payment_data_pagamento">
+            <column name="data_pagamento"/>
+        </createIndex>
+    </changeSet>
 
 </databaseChangeLog>
-
