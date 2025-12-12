@@ -136,60 +136,124 @@ cd jurispay-api
 
 ---
 
-### 2. Subir o ambiente com Docker (API + PostgreSQL)
+## 🐳 Rodar com Docker
 
-Crie o arquivo `docker-compose.yml`:
-
-```yaml
-version: '3.8'
-services:
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: jurispay
-      POSTGRES_PASSWORD: jurispay
-      POSTGRES_DB: jurispaydb
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-  api:
-    build: .
-    container_name: jurispay-api
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-    depends_on:
-      - postgres
-
-volumes:
-  pgdata:
-```
-
----
-
-### 3. Gerar imagem e iniciar containers
+### Build e subir os containers
 
 ```bash
-docker compose up --build
+docker compose up --build -d
 ```
+
+Este comando irá:
+- Construir a imagem da API usando o Dockerfile multi-stage
+- Subir o PostgreSQL 16 em um container
+- Aguardar o banco ficar saudável antes de iniciar a API
+- Executar as migrações do Liquibase automaticamente
+
+### Ver logs da API
+
+```bash
+docker compose logs -f api
+```
+
+### Ver logs do banco de dados
+
+```bash
+docker compose logs -f db
+```
+
+### Parar os containers
+
+```bash
+docker compose down
+```
+
+### Reset do banco (apagar volume)
+
+⚠️ **Atenção:** Isso apagará todos os dados do banco de dados.
+
+```bash
+docker compose down -v
+```
+
+### Acessar a API
+
+Após subir os containers, a API estará disponível em:
+
+- **Swagger UI:** http://localhost:8080/swagger-ui.html
+- **API Base:** http://localhost:8080/api
+
+### Estrutura Docker
+
+O projeto inclui:
+
+- **Dockerfile multi-stage:** Build otimizado com cache de dependências Maven
+- **docker-compose.yml:** Orquestração de serviços (API + PostgreSQL + MinIO)
+- **application-docker.properties:** Configurações específicas para ambiente Docker
+- **Health checks:** Garantia de que o banco e MinIO estão prontos antes da API iniciar
 
 ---
 
-### 4. Acessar a API
+## 📁 Armazenamento de Arquivos (MinIO)
 
-Swagger UI disponível em:
+O Jurispay utiliza **MinIO** como serviço de armazenamento de objetos compatível com S3 para gerenciar documentos e arquivos dos clientes.
 
+### Acesso ao Console MinIO
+
+Após subir os containers, acesse o console web do MinIO em:
+
+**http://localhost:9001**
+
+**Credenciais:**
+- **Access Key:** `jurispay`
+- **Secret Key:** `jurispay123`
+
+### Bucket Padrão
+
+O bucket `jurispay-documents` é criado automaticamente ao subir os containers. Este bucket é usado para armazenar:
+
+- Documentos de clientes (CPF, RG, comprovantes)
+- Comprovantes de pagamento
+- Arquivos de análise de crédito
+- Outros documentos relacionados ao sistema
+
+### Configuração
+
+As configurações do MinIO estão definidas em `application-docker.properties`:
+
+```properties
+jurispay.filestorage.provider=minio
+jurispay.filestorage.bucket=jurispay-documents
+jurispay.filestorage.endpoint=http://minio:9000
+jurispay.filestorage.access-key=jurispay
+jurispay.filestorage.secret-key=jurispay123
+jurispay.filestorage.region=us-east-1
+jurispay.filestorage.public-base-url=http://localhost:9000/jurispay-documents
 ```
-http://localhost:8080/swagger-ui.html
-```
 
-ou
+### ⚠️ Segurança e LGPD
 
-```
-/swagger-ui/index.html
+**IMPORTANTE:** 
+
+- ⚠️ As credenciais acima são apenas para **desenvolvimento local**. Em produção, utilize variáveis de ambiente ou um gerenciador de segredos.
+- 🔒 **Regra fundamental:** No banco de dados, armazenar **apenas o KEY/URL** do arquivo, **nunca o conteúdo binário**.
+- 📋 Isso garante conformidade com LGPD e melhor performance do banco de dados.
+- 🔐 Os arquivos ficam armazenados no MinIO com controle de acesso adequado.
+
+### Comandos Úteis
+
+```bash
+# Subir todos os serviços (incluindo MinIO)
+docker compose up --build -d
+
+# Ver logs do MinIO
+docker compose logs -f minio
+
+# Parar todos os serviços
+docker compose down
+
+# Reset completo (apaga volumes de banco e MinIO)
+docker compose down -v
 ```
 
 ---
