@@ -2,6 +2,9 @@ package br.com.jurispay.infrastructure.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -12,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * Configuração de segurança da aplicação usando Spring Security 6+.
- * Utiliza o modelo novo de SecurityFilterChain.
+ * Utiliza Resource Server JWT para autenticação stateless.
  * 
  * <p>Roles:
  * <ul>
@@ -26,20 +29,21 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Endpoints públicos (Swagger e Actuator)
+                // Endpoints públicos: autenticação e documentação
                 .requestMatchers(
+                    "/api/auth/**",
                     "/",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/v3/api-docs/**",
-                    "/actuator/health",
-                    "/actuator/info"
+                    "/actuator/**"
                 ).permitAll()
                 
                 // Download de documentos (LGPD) - apenas ADMIN e OPERATOR
@@ -119,10 +123,10 @@ public class SecurityConfig {
                     "/api/collections/**"
                 ).hasAnyRole("ADMIN", "OPERATOR", "AUDITOR")
                 
-                // Qualquer outra requisição requer autenticação
+                // Qualquer outra requisição requer autenticação JWT
                 .anyRequest().authenticated()
             )
-            .httpBasic(httpBasic -> {});
+            .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()));
 
         return http.build();
     }
@@ -130,6 +134,18 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Expõe AuthenticationManager como bean para uso em use cases.
+     *
+     * @param config configuração de autenticação
+     * @return AuthenticationManager
+     * @throws Exception se houver erro na configuração
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }
 
