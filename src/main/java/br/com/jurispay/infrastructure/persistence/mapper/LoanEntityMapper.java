@@ -37,6 +37,7 @@ public interface LoanEntityMapper {
         }
 
         return LoanEntity.builder()
+                .id(loan.getId())
                 .customer(customerEntity)
                 .valorSolicitado(loan.getValorSolicitado())
                 .valorDevolucaoPrevista(loan.getValorDevolucaoPrevista())
