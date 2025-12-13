@@ -8,7 +8,7 @@ import br.com.jurispay.domain.common.exception.ValidationException;
 import br.com.jurispay.domain.creditanalysis.model.CreditAnalysis;
 import br.com.jurispay.domain.creditanalysis.model.CreditAnalysisStatus;
 import br.com.jurispay.domain.creditanalysis.repository.CreditAnalysisRepository;
-import br.com.jurispay.domain.creditanalysis.service.CreditAnalysisDomainService;
+import br.com.jurispay.application.creditanalysis.service.CreditAnalysisDecisionValidator;
 import br.com.jurispay.domain.customer.repository.CustomerRepository;
 import br.com.jurispay.domain.document.model.Document;
 import br.com.jurispay.domain.document.model.DocumentStatus;
@@ -44,19 +44,19 @@ public class DecideCreditAnalysisUseCaseImpl implements DecideCreditAnalysisUseC
     private final CreditAnalysisRepository creditAnalysisRepository;
     private final CustomerRepository customerRepository;
     private final DocumentRepository documentRepository;
-    private final CreditAnalysisDomainService domainService;
+    private final CreditAnalysisDecisionValidator decisionValidator;
     private final CreditAnalysisApplicationMapper mapper;
 
     public DecideCreditAnalysisUseCaseImpl(
             CreditAnalysisRepository creditAnalysisRepository,
             CustomerRepository customerRepository,
             DocumentRepository documentRepository,
-            CreditAnalysisDomainService domainService,
+            CreditAnalysisDecisionValidator decisionValidator,
             CreditAnalysisApplicationMapper mapper) {
         this.creditAnalysisRepository = creditAnalysisRepository;
         this.customerRepository = customerRepository;
         this.documentRepository = documentRepository;
-        this.domainService = domainService;
+        this.decisionValidator = decisionValidator;
         this.mapper = mapper;
     }
 
@@ -116,8 +116,8 @@ public class DecideCreditAnalysisUseCaseImpl implements DecideCreditAnalysisUseC
                 .updatedAt(now)
                 .build();
 
-        // Validar regras de domínio
-        domainService.validateDecision(updatedAnalysis);
+        // Validar regras de decisão
+        decisionValidator.validateDecision(updatedAnalysis);
 
         // Salvar análise
         CreditAnalysis savedAnalysis = creditAnalysisRepository.save(updatedAnalysis);
