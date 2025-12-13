@@ -11,4 +11,6 @@ databaseChangeLog:
       file: classpath:db/changelog/changesets/005-create-credit-analysis.xml
   - include:
       file: classpath:db/changelog/changesets/006-create-collection-action.xml
+  - include:
+      file: classpath:db/changelog/changesets/007-alter-document-add-loan-id.xml
 
