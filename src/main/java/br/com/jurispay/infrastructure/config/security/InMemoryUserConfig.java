@@ -22,8 +22,20 @@ public class InMemoryUserConfig {
         return username -> {
             if ("admin".equals(username)) {
                 return User.withUsername("admin")
-                        .password(encoder.encode("jurispay@admin"))
+                        .password(encoder.encode("admin123"))
                         .roles("ADMIN")
+                        .build();
+            }
+            if ("operator".equals(username)) {
+                return User.withUsername("operator")
+                        .password(encoder.encode("operator123"))
+                        .roles("OPERATOR")
+                        .build();
+            }
+            if ("auditor".equals(username)) {
+                return User.withUsername("auditor")
+                        .password(encoder.encode("auditor123"))
+                        .roles("AUDITOR")
                         .build();
             }
             throw new UsernameNotFoundException("Usuário não encontrado: " + username);
