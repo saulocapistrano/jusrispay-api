@@ -5,6 +5,8 @@ import br.com.jurispay.application.loan.dto.LoanResponse;
 import br.com.jurispay.application.loan.mapper.LoanApplicationMapper;
 import br.com.jurispay.domain.common.exception.NotFoundException;
 import br.com.jurispay.domain.common.exception.ValidationException;
+import br.com.jurispay.domain.creditanalysis.model.CreditAnalysisStatus;
+import br.com.jurispay.domain.creditanalysis.repository.CreditAnalysisRepository;
 import br.com.jurispay.domain.customer.repository.CustomerRepository;
 import br.com.jurispay.domain.loan.model.Loan;
 import br.com.jurispay.domain.loan.model.LoanStatus;
@@ -25,14 +27,17 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
 
     private final LoanRepository loanRepository;
     private final CustomerRepository customerRepository;
+    private final CreditAnalysisRepository creditAnalysisRepository;
     private final LoanApplicationMapper mapper;
 
     public CreateLoanUseCaseImpl(
             LoanRepository loanRepository,
             CustomerRepository customerRepository,
+            CreditAnalysisRepository creditAnalysisRepository,
             LoanApplicationMapper mapper) {
         this.loanRepository = loanRepository;
         this.customerRepository = customerRepository;
+        this.creditAnalysisRepository = creditAnalysisRepository;
         this.mapper = mapper;
     }
 
@@ -44,6 +49,11 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
         // Verificar se cliente existe
         customerRepository.findById(command.getCustomerId())
                 .orElseThrow(() -> new NotFoundException("Cliente não encontrado para criação de empréstimo."));
+
+        // Verificar se cliente está aprovado na análise de crédito
+        creditAnalysisRepository.findByCustomerId(command.getCustomerId())
+                .filter(analysis -> analysis.getStatus() == CreditAnalysisStatus.APPROVED)
+                .orElseThrow(() -> new ValidationException("Cliente não aprovado na análise de crédito."));
 
         // Criar Loan base a partir do comando
         Loan loan = mapper.toDomain(command);
