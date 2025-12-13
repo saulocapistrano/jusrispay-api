@@ -60,6 +60,12 @@ public class SecurityConfig {
                     "/api/contracts/pdf/**"
                 ).hasAnyRole("ADMIN", "OPERATOR")
                 
+                // Endpoints de relatórios - leitura
+                .requestMatchers(
+                    org.springframework.http.HttpMethod.GET,
+                    "/api/reports/**"
+                ).hasAnyRole("ADMIN", "OPERATOR", "AUDITOR")
+                
                 // Endpoints de escrita (POST/PATCH/PUT/DELETE) - ADMIN e OPERATOR
                 .requestMatchers(
                     org.springframework.http.HttpMethod.POST,
