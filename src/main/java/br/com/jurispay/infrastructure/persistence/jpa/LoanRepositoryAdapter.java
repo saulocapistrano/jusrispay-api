@@ -61,5 +61,12 @@ public class LoanRepositoryAdapter implements LoanRepository {
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Loan> findByStatus(br.com.jurispay.domain.loan.model.LoanStatus status) {
+        return springDataLoanRepository.findByStatus(status).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
 }
 
