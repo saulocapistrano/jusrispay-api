@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="007-alter-document-add-loan-id" author="jurispay">
+        <!-- Precondition: só executa se a coluna não existir -->
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="document" columnName="loan_id"/>
+            </not>
+        </preConditions>
+
+        <!-- Adicionar coluna loan_id se não existir -->
+        <addColumn tableName="document">
+            <column name="loan_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <!-- Criar índice em loan_id se não existir -->
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="idx_document_loan_id"/>
+            </not>
+        </preConditions>
+        
+        <createIndex
+            tableName="document"
+            indexName="idx_document_loan_id">
+            <column name="loan_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
+
