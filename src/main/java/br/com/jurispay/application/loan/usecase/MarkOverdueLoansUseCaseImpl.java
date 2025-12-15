@@ -36,21 +36,8 @@ public class MarkOverdueLoansUseCaseImpl implements MarkOverdueLoansUseCase {
             if (loan.getDataPrevistaDevolucao() != null
                     && loan.getDataPrevistaDevolucao().isBefore(now)) {
 
-                // Atualizar status para OVERDUE
-                Loan updatedLoan = Loan.builder()
-                        .id(loan.getId())
-                        .customerId(loan.getCustomerId())
-                        .valorSolicitado(loan.getValorSolicitado())
-                        .valorDevolucaoPrevista(loan.getValorDevolucaoPrevista())
-                        .taxaJuros(loan.getTaxaJuros())
-                        .multaDiaria(loan.getMultaDiaria())
-                        .dataLiberacao(loan.getDataLiberacao())
-                        .dataPrevistaDevolucao(loan.getDataPrevistaDevolucao())
-                        .dataCriacao(loan.getDataCriacao())
-                        .dataAtualizacao(now)
-                        .status(LoanStatus.OVERDUE)
-                        .build();
-
+                // Atualizar status para OVERDUE usando método do domínio
+                Loan updatedLoan = loan.markAsOverdue();
                 loanRepository.save(updatedLoan);
                 updatedCount++;
 
