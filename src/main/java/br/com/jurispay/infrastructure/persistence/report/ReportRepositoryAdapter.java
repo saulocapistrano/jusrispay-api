@@ -3,6 +3,7 @@ package br.com.jurispay.infrastructure.persistence.report;
 import br.com.jurispay.domain.collection.model.OverdueInfo;
 import br.com.jurispay.domain.collection.service.OverdueCalculator;
 import br.com.jurispay.domain.loan.model.LoanStatus;
+import br.com.jurispay.domain.loan.service.RoiCalculator;
 import br.com.jurispay.domain.report.model.DueLoanItem;
 import br.com.jurispay.domain.report.model.OverdueLoanItem;
 import br.com.jurispay.domain.report.model.PortfolioSummary;
@@ -13,7 +14,6 @@ import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,12 +27,15 @@ public class ReportRepositoryAdapter implements ReportRepository {
 
     private final EntityManager entityManager;
     private final OverdueCalculator overdueCalculator;
+    private final RoiCalculator roiCalculator;
 
     public ReportRepositoryAdapter(
             EntityManager entityManager,
-            OverdueCalculator overdueCalculator) {
+            OverdueCalculator overdueCalculator,
+            RoiCalculator roiCalculator) {
         this.entityManager = entityManager;
         this.overdueCalculator = overdueCalculator;
+        this.roiCalculator = roiCalculator;
     }
 
     @Override
@@ -49,8 +52,8 @@ public class ReportRepositoryAdapter implements ReportRepository {
         // Lucro total
         BigDecimal totalProfit = totalReceived.subtract(totalLoaned);
 
-        // ROI percentual
-        BigDecimal roiPercent = calculateRoiPercent(totalProfit, totalLoaned);
+        // ROI percentual usando RoiCalculator
+        BigDecimal roiPercent = roiCalculator.calculateRoiPercent(totalProfit, totalLoaned);
 
         // Contagens por status
         Long openLoans = countLoansByStatus(LoanStatus.OPEN);
@@ -132,15 +135,6 @@ public class ReportRepositoryAdapter implements ReportRepository {
         return query.getSingleResult();
     }
 
-    private BigDecimal calculateRoiPercent(BigDecimal totalProfit, BigDecimal totalLoaned) {
-        if (totalLoaned == null || totalLoaned.compareTo(BigDecimal.ZERO) == 0) {
-            return BigDecimal.ZERO;
-        }
-        return totalProfit
-                .divide(totalLoaned, 4, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100))
-                .setScale(2, RoundingMode.HALF_UP);
-    }
 
     private DueLoanItem toDueLoanItem(LoanEntity entity) {
         return DueLoanItem.builder()
