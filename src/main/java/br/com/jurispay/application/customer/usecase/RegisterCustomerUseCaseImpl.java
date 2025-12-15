@@ -3,6 +3,7 @@ package br.com.jurispay.application.customer.usecase;
 import br.com.jurispay.application.customer.dto.CustomerRegistrationCommand;
 import br.com.jurispay.application.customer.dto.CustomerResponse;
 import br.com.jurispay.application.customer.mapper.CustomerApplicationMapper;
+import br.com.jurispay.domain.common.exception.ErrorCode;
 import br.com.jurispay.domain.common.exception.ValidationException;
 import br.com.jurispay.domain.customer.model.Customer;
 import br.com.jurispay.domain.customer.repository.CustomerRepository;
@@ -28,7 +29,7 @@ public class RegisterCustomerUseCaseImpl implements RegisterCustomerUseCase {
     public CustomerResponse register(CustomerRegistrationCommand command) {
         // Valida se CPF já existe
         if (customerRepository.existsByCpf(command.getCpf())) {
-            throw new ValidationException("CPF já cadastrado.");
+            throw new ValidationException(ErrorCode.DUPLICATE_CPF, "CPF já cadastrado.");
         }
 
         // Converte comando para domínio
