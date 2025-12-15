@@ -81,5 +81,36 @@ public class Document {
      * Observações internas sobre o documento (não deve conter dados sensíveis).
      */
     private String notes;
+
+    /**
+     * Valida o documento com o status e notas fornecidos.
+     * Cria uma nova instância com status atualizado e validatedAt atualizado.
+     *
+     * @param newStatus novo status de validação (VALIDATED ou REJECTED)
+     * @param notes observações sobre a validação
+     * @return nova instância de Document com status atualizado
+     * @throws IllegalArgumentException se newStatus for UPLOADED
+     */
+    public Document validate(DocumentStatus newStatus, String notes) {
+        if (newStatus == DocumentStatus.UPLOADED) {
+            throw new IllegalArgumentException("Status de validação deve ser VALIDATED ou REJECTED.");
+        }
+
+        return Document.builder()
+                .id(this.id)
+                .customerId(this.customerId)
+                .loanId(this.loanId)
+                .type(this.type)
+                .status(newStatus)
+                .originalFileName(this.originalFileName)
+                .contentType(this.contentType)
+                .sizeBytes(this.sizeBytes)
+                .bucket(this.bucket)
+                .objectKey(this.objectKey)
+                .uploadedAt(this.uploadedAt)
+                .validatedAt(Instant.now())
+                .notes(notes)
+                .build();
+    }
 }
 
