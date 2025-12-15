@@ -11,5 +11,13 @@ public class NotFoundException extends BusinessException {
     public NotFoundException(String message) {
         super(DEFAULT_CODE, message);
     }
+
+    public NotFoundException(ErrorCode errorCode, String message) {
+        super(errorCode.getCode(), message);
+    }
+
+    public NotFoundException(ErrorCode errorCode) {
+        super(errorCode.getCode(), errorCode.getDefaultMessage());
+    }
 }
 
