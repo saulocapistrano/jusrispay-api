@@ -1,7 +1,7 @@
 package br.com.jurispay.api.controller.loan;
 
 import br.com.jurispay.api.dto.loan.LoanRequest;
-import br.com.jurispay.application.loan.dto.LoanCreationCommand;
+import br.com.jurispay.api.mapper.loan.LoanRequestToCommandMapper;
 import br.com.jurispay.application.loan.dto.LoanResponse;
 import br.com.jurispay.application.loan.usecase.CreateLoanUseCase;
 import br.com.jurispay.application.loan.usecase.GetLoanByIdUseCase;
@@ -25,25 +25,22 @@ public class LoanController {
     private final CreateLoanUseCase createLoanUseCase;
     private final GetLoanByIdUseCase getLoanByIdUseCase;
     private final ListLoansUseCase listLoansUseCase;
+    private final LoanRequestToCommandMapper requestMapper;
 
     public LoanController(
             CreateLoanUseCase createLoanUseCase,
             GetLoanByIdUseCase getLoanByIdUseCase,
-            ListLoansUseCase listLoansUseCase) {
+            ListLoansUseCase listLoansUseCase,
+            LoanRequestToCommandMapper requestMapper) {
         this.createLoanUseCase = createLoanUseCase;
         this.getLoanByIdUseCase = getLoanByIdUseCase;
         this.listLoansUseCase = listLoansUseCase;
+        this.requestMapper = requestMapper;
     }
 
     @PostMapping
     public ResponseEntity<LoanResponse> create(@Valid @RequestBody LoanRequest request) {
-        LoanCreationCommand command = LoanCreationCommand.builder()
-                .customerId(request.getCustomerId())
-                .valorSolicitado(request.getValorSolicitado())
-                .dataPrevistaDevolucao(request.getDataPrevistaDevolucao())
-                .build();
-
-        LoanResponse response = createLoanUseCase.create(command);
+        LoanResponse response = createLoanUseCase.create(requestMapper.toCommand(request));
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
