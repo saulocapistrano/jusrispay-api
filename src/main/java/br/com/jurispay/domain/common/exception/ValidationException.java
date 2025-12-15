@@ -10,5 +10,13 @@ public class ValidationException extends BusinessException {
     public ValidationException(String message) {
         super(DEFAULT_CODE, message);
     }
+
+    public ValidationException(ErrorCode errorCode, String message) {
+        super(errorCode.getCode(), message);
+    }
+
+    public ValidationException(ErrorCode errorCode) {
+        super(errorCode.getCode(), errorCode.getDefaultMessage());
+    }
 }
 
