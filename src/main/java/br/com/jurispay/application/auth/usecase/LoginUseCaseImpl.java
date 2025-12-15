@@ -23,15 +23,12 @@ public class LoginUseCaseImpl implements LoginUseCase {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
-    private final JwtConfig jwtConfig;
 
     public LoginUseCaseImpl(
             AuthenticationManager authenticationManager,
-            JwtTokenService jwtTokenService,
-            JwtConfig jwtConfig) {
+            JwtTokenService jwtTokenService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenService = jwtTokenService;
-        this.jwtConfig = jwtConfig;
     }
 
     @Override
@@ -42,7 +39,7 @@ public class LoginUseCaseImpl implements LoginUseCase {
                     new UsernamePasswordAuthenticationToken(username, password)
             );
 
-            // Extrai roles das authorities
+            // Extrai roles das authorities (mantém "ROLE_" pois será removido no JwtTokenService)
             Collection<String> roles = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
@@ -50,8 +47,8 @@ public class LoginUseCaseImpl implements LoginUseCase {
             // Gera token JWT
             String token = jwtTokenService.generateToken(username, roles);
 
-            // Calcula expiresIn em segundos
-            long expiresIn = jwtConfig.getExpirationMinutes() * 60;
+            // Calcula expiresIn em segundos (1 hora)
+            long expiresIn = JwtConfig.EXPIRES_IN_SECONDS;
 
             return TokenResponse.builder()
                     .accessToken(token)
@@ -61,7 +58,9 @@ public class LoginUseCaseImpl implements LoginUseCase {
 
         } catch (BadCredentialsException e) {
             // Não logar detalhes sensíveis (LGPD)
-            throw new ValidationException("Credenciais inválidas.");
+            // Re-lança como BadCredentialsException para ser tratada pelo Spring Security
+            // O SecurityConfig ou handler deve retornar 401
+            throw e;
         }
     }
 }
