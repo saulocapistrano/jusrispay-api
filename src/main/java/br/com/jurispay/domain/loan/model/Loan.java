@@ -30,5 +30,49 @@ public class Loan {
     private Instant dataCriacao;
     private Instant dataAtualizacao;
     private LoanStatus status;
+
+    /**
+     * Marca o empréstimo como OVERDUE (em atraso).
+     * Cria uma nova instância com status atualizado e dataAtualizacao atualizada.
+     *
+     * @return nova instância de Loan com status OVERDUE
+     */
+    public Loan markAsOverdue() {
+        return Loan.builder()
+                .id(this.id)
+                .customerId(this.customerId)
+                .valorSolicitado(this.valorSolicitado)
+                .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
+                .taxaJuros(this.taxaJuros)
+                .multaDiaria(this.multaDiaria)
+                .dataLiberacao(this.dataLiberacao)
+                .dataPrevistaDevolucao(this.dataPrevistaDevolucao)
+                .dataCriacao(this.dataCriacao)
+                .dataAtualizacao(Instant.now())
+                .status(LoanStatus.OVERDUE)
+                .build();
+    }
+
+    /**
+     * Marca o empréstimo como PAID (pago).
+     * Cria uma nova instância com status atualizado e dataAtualizacao atualizada.
+     *
+     * @return nova instância de Loan com status PAID
+     */
+    public Loan markAsPaid() {
+        return Loan.builder()
+                .id(this.id)
+                .customerId(this.customerId)
+                .valorSolicitado(this.valorSolicitado)
+                .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
+                .taxaJuros(this.taxaJuros)
+                .multaDiaria(this.multaDiaria)
+                .dataLiberacao(this.dataLiberacao)
+                .dataPrevistaDevolucao(this.dataPrevistaDevolucao)
+                .dataCriacao(this.dataCriacao)
+                .dataAtualizacao(Instant.now())
+                .status(LoanStatus.PAID)
+                .build();
+    }
 }
 
