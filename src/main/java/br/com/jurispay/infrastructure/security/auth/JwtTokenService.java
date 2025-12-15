@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -18,38 +19,33 @@ import java.util.stream.Collectors;
 public class JwtTokenService {
 
     private final JwtEncoder jwtEncoder;
-    private final String issuer;
-    private final Long expirationMinutes;
 
-    public JwtTokenService(JwtEncoder jwtEncoder, JwtConfig jwtConfig) {
+    public JwtTokenService(JwtEncoder jwtEncoder) {
         this.jwtEncoder = jwtEncoder;
-        this.issuer = jwtConfig.getJwtIssuer();
-        this.expirationMinutes = jwtConfig.getExpirationMinutes();
     }
 
     /**
      * Gera um token JWT para o usuário e roles especificados.
      *
      * @param username nome de usuário (será usado como 'sub')
-     * @param roles    coleção de roles do usuário
+     * @param roles    coleção de roles do usuário (pode conter "ROLE_" como prefixo)
      * @return token JWT como string
      */
     public String generateToken(String username, Collection<String> roles) {
         Instant now = Instant.now();
-        Instant expiration = now.plusSeconds(expirationMinutes * 60);
+        Instant expiration = now.plusSeconds(JwtConfig.EXPIRES_IN_SECONDS);
 
-        // Converte roles para scope (formato OAuth2: espaço separado)
-        String scope = roles.stream()
+        // Remove prefixo "ROLE_" se existir e converte para lista
+        List<String> cleanRoles = roles.stream()
                 .map(role -> role.startsWith("ROLE_") ? role.substring(5) : role)
-                .collect(Collectors.joining(" "));
+                .collect(Collectors.toList());
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer(issuer)
+                .issuer(JwtConfig.ISSUER)
                 .subject(username)
                 .issuedAt(now)
                 .expiresAt(expiration)
-                .claim("scope", scope)
-                .claim("roles", roles) // Mantém roles como array também
+                .claim("roles", cleanRoles) // Roles sem prefixo "ROLE_"
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
