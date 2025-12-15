@@ -3,6 +3,8 @@ package br.com.jurispay.application.creditanalysis.usecase;
 import br.com.jurispay.application.creditanalysis.dto.CreditAnalysisResponse;
 import br.com.jurispay.application.creditanalysis.dto.StartCreditAnalysisCommand;
 import br.com.jurispay.application.creditanalysis.mapper.CreditAnalysisApplicationMapper;
+import br.com.jurispay.application.creditanalysis.validator.StartCreditAnalysisCommandValidator;
+import br.com.jurispay.domain.common.exception.ErrorCode;
 import br.com.jurispay.domain.common.exception.NotFoundException;
 import br.com.jurispay.domain.common.exception.ValidationException;
 import br.com.jurispay.domain.creditanalysis.model.CreditAnalysis;
@@ -23,30 +25,27 @@ public class StartCreditAnalysisUseCaseImpl implements StartCreditAnalysisUseCas
     private final CreditAnalysisRepository creditAnalysisRepository;
     private final CustomerRepository customerRepository;
     private final CreditAnalysisApplicationMapper mapper;
+    private final StartCreditAnalysisCommandValidator validator;
 
     public StartCreditAnalysisUseCaseImpl(
             CreditAnalysisRepository creditAnalysisRepository,
             CustomerRepository customerRepository,
-            CreditAnalysisApplicationMapper mapper) {
+            CreditAnalysisApplicationMapper mapper,
+            StartCreditAnalysisCommandValidator validator) {
         this.creditAnalysisRepository = creditAnalysisRepository;
         this.customerRepository = customerRepository;
         this.mapper = mapper;
+        this.validator = validator;
     }
 
     @Override
     public CreditAnalysisResponse start(StartCreditAnalysisCommand command) {
         // Validações básicas
-        if (command.getCustomerId() == null) {
-            throw new ValidationException("ID do cliente é obrigatório.");
-        }
-
-        if (command.getAnalystUserId() == null) {
-            throw new ValidationException("ID do analista é obrigatório.");
-        }
+        validator.validate(command);
 
         // Verificar se cliente existe
         customerRepository.findById(command.getCustomerId())
-                .orElseThrow(() -> new NotFoundException("Cliente não encontrado para iniciar análise."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.CUSTOMER_NOT_FOUND, "Cliente não encontrado para iniciar análise."));
 
         // Verificar se já existe análise para este cliente
         CreditAnalysis existingAnalysis = creditAnalysisRepository.findByCustomerId(command.getCustomerId())
@@ -58,11 +57,11 @@ public class StartCreditAnalysisUseCaseImpl implements StartCreditAnalysisUseCas
             CreditAnalysisStatus currentStatus = existingAnalysis.getStatus();
 
             if (currentStatus == CreditAnalysisStatus.APPROVED) {
-                throw new ValidationException("Cliente já aprovado.");
+                throw new ValidationException(ErrorCode.CUSTOMER_ALREADY_APPROVED, "Cliente já aprovado.");
             }
 
             if (currentStatus == CreditAnalysisStatus.IN_REVIEW) {
-                throw new ValidationException("Análise já está em andamento.");
+                throw new ValidationException(ErrorCode.ANALYSIS_ALREADY_IN_REVIEW, "Análise já está em andamento.");
             }
 
             // Se REJECTED ou PENDING, permitir reiniciar
