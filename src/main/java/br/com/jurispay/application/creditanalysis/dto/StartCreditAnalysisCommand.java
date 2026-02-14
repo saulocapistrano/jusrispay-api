@@ -16,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class StartCreditAnalysisCommand {
 
-    private Long customerId;
+    private Long loanId;
 
     private Long analystUserId;
 }

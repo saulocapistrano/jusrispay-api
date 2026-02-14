@@ -7,15 +7,15 @@ import br.com.jurispay.domain.creditanalysis.repository.CreditAnalysisRepository
 import org.springframework.stereotype.Service;
 
 /**
- * Implementação do use case de busca de análise por cliente.
+ * Implementação do use case de busca de análise por empréstimo.
  */
 @Service
-public class GetCreditAnalysisByCustomerUseCaseImpl implements GetCreditAnalysisByCustomerUseCase {
+public class GetCreditAnalysisByLoanUseCaseImpl implements GetCreditAnalysisByLoanUseCase {
 
     private final CreditAnalysisRepository creditAnalysisRepository;
     private final CreditAnalysisApplicationMapper mapper;
 
-    public GetCreditAnalysisByCustomerUseCaseImpl(
+    public GetCreditAnalysisByLoanUseCaseImpl(
             CreditAnalysisRepository creditAnalysisRepository,
             CreditAnalysisApplicationMapper mapper) {
         this.creditAnalysisRepository = creditAnalysisRepository;
@@ -23,10 +23,9 @@ public class GetCreditAnalysisByCustomerUseCaseImpl implements GetCreditAnalysis
     }
 
     @Override
-    public CreditAnalysisResponse getByCustomerId(Long customerId) {
-        return creditAnalysisRepository.findByCustomerId(customerId)
+    public CreditAnalysisResponse getByLoanId(Long loanId) {
+        return creditAnalysisRepository.findByLoanId(loanId)
                 .map(mapper::toResponse)
-                .orElseThrow(() -> new NotFoundException("Análise de crédito não encontrada para o cliente."));
+                .orElseThrow(() -> new NotFoundException("Análise de crédito não encontrada para o empréstimo."));
     }
 }
-
