@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="008-alter-loan-make-data-liberacao-nullable" author="jurispay">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="loan" columnName="data_liberacao"/>
+        </preConditions>
+        <dropNotNullConstraint
+            tableName="loan"
+            columnName="data_liberacao"
+            columnDataType="TIMESTAMP"/>
+    </changeSet>
+
+    <changeSet id="008-alter-credit-analysis-add-loan-id" author="jurispay">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="credit_analysis" columnName="loan_id"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="credit_analysis">
+            <column name="loan_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <createIndex
+            tableName="credit_analysis"
+            indexName="idx_credit_analysis_loan_id">
+            <column name="loan_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="credit_analysis"
+            baseColumnNames="loan_id"
+            referencedTableName="loan"
+            referencedColumnNames="id"
+            constraintName="fk_credit_analysis_loan"
+            onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="008-alter-credit-analysis-drop-unique-customer-id" author="jurispay">
+        <preConditions onFail="MARK_RAN">
+            <uniqueConstraintExists tableName="credit_analysis" constraintName="uk_credit_analysis_customer_id"/>
+        </preConditions>
+
+        <dropUniqueConstraint
+            tableName="credit_analysis"
+            constraintName="uk_credit_analysis_customer_id"/>
+
+        <createIndex
+            tableName="credit_analysis"
+            indexName="idx_credit_analysis_customer_id_non_unique">
+            <column name="customer_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

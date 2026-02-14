@@ -13,4 +13,15 @@ databaseChangeLog:
       file: classpath:db/changelog/changesets/006-create-collection-action.xml
   - include:
       file: classpath:db/changelog/changesets/007-alter-document-add-loan-id.xml
+  - include:
+      file: classpath:db/changelog/changesets/008-alter-loan-credit-analysis-for-loan-workflow.xml
+  - include:
+      file: classpath:db/changelog/changesets/009-alter-customer-add-registration-fields.xml
+  - include:
+      file: classpath:db/changelog/changesets/010-alter-loan-add-repayment-fields.xml
+  - include:
+      file: classpath:db/changelog/changesets/011-create-view-vw-loan-with-customer.xml
+
+  - include:
+      file: classpath:db/changelog/changesets/012-create-receivable.xml
 
