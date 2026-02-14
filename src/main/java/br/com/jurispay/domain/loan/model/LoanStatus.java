@@ -9,6 +9,10 @@ public enum LoanStatus {
      */
     REQUESTED,
 
+    APPROVED,
+
+    CREDITED,
+
     /**
      * Empréstimo criado/ativo.
      */
