@@ -10,6 +10,8 @@ services:
       - "15432:5432"
     volumes:
       - jurispay_pgdata:/var/lib/postgresql/data
+    networks:
+      - jurispay_backend
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U jurispay -d jurispay"]
       interval: 5s
@@ -28,6 +30,8 @@ services:
     command: server /data --console-address ":9001"
     volumes:
       - jurispay_minio_data:/data
+    networks:
+      - jurispay_backend
     healthcheck:
       test: ["CMD-SHELL", "mc ready local || exit 1"]
       interval: 5s
@@ -40,6 +44,8 @@ services:
     depends_on:
       minio:
         condition: service_healthy
+    networks:
+      - jurispay_backend
     entrypoint: >
       /bin/sh -c "
       mc alias set jurispay http://minio:9000 jurispay jurispay123;
@@ -57,11 +63,17 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     ports:
       - "18080:8080"
+    networks:
+      - jurispay_backend
     depends_on:
       db:
         condition: service_healthy
       minio:
         condition: service_healthy
+
+networks:
+  jurispay_backend:
+    name: jurispay_backend
 
 volumes:
   jurispay_pgdata:
