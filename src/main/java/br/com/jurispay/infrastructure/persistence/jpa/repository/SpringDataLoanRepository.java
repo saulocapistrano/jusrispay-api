@@ -14,5 +14,6 @@ import java.util.List;
 public interface SpringDataLoanRepository extends JpaRepository<LoanEntity, Long> {
 
     List<LoanEntity> findByStatus(LoanStatus status);
-}
 
+    List<LoanEntity> findByCustomer_Id(Long customerId);
+}

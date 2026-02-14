@@ -13,5 +13,7 @@ import java.util.Optional;
 public interface SpringDataCreditAnalysisRepository extends JpaRepository<CreditAnalysisEntity, Long> {
 
     Optional<CreditAnalysisEntity> findByCustomerId(Long customerId);
+
+    Optional<CreditAnalysisEntity> findByLoanId(Long loanId);
 }
 
