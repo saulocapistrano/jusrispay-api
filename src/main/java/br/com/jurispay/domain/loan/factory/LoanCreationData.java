@@ -3,6 +3,8 @@ package br.com.jurispay.domain.loan.factory;
 import lombok.Builder;
 import lombok.Getter;
 
+import br.com.jurispay.domain.loan.model.LoanPaymentPeriod;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -23,6 +25,17 @@ public class LoanCreationData {
      * Valor solicitado pelo cliente.
      */
     private final BigDecimal valorSolicitado;
+
+    /**
+     * Taxa de juros do empréstimo.
+     * Ex: 0.30 para 30%
+     */
+    private final BigDecimal taxaJuros;
+
+    /**
+     * Período de pagamento do empréstimo.
+     */
+    private final LoanPaymentPeriod periodoPagamento;
 
     /**
      * Data prevista para devolução do empréstimo.

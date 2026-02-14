@@ -1,6 +1,7 @@
 package br.com.jurispay.domain.loan.factory;
 
 import br.com.jurispay.domain.loan.model.Loan;
+import br.com.jurispay.domain.loan.model.LoanPaymentPeriod;
 import br.com.jurispay.domain.loan.model.LoanStatus;
 import br.com.jurispay.domain.loan.policy.LoanPolicy;
 
@@ -20,11 +21,15 @@ public class LoanFactory {
      * @param data dados de criação do empréstimo
      * @param policy política de empréstimo (define taxas e multas)
      * @param now data/hora atual para timestamps
-     * @return Loan criado com status OPEN
+     * @return Loan criado com status REQUESTED
      */
     public Loan create(LoanCreationData data, LoanPolicy policy, Instant now) {
-        BigDecimal taxaJuros = policy.getInterestRate();
+        BigDecimal taxaJuros = data.getTaxaJuros() != null
+                ? data.getTaxaJuros()
+                : policy.getInterestRate();
         BigDecimal multaDiaria = policy.getDailyFine();
+
+        LoanPaymentPeriod periodoPagamento = data.getPeriodoPagamento();
 
         // Calcular valor de devolução prevista: valorSolicitado * (1 + taxaJuros)
         BigDecimal valorDevolucaoPrevista = data.getValorSolicitado()
@@ -36,11 +41,14 @@ public class LoanFactory {
                 .valorDevolucaoPrevista(valorDevolucaoPrevista)
                 .taxaJuros(taxaJuros)
                 .multaDiaria(multaDiaria)
-                .dataLiberacao(now)
+                .periodoPagamento(periodoPagamento)
+                .quantidadeParcelas(null)
+                .valorParcela(null)
+                .dataLiberacao(null)
                 .dataPrevistaDevolucao(data.getDataPrevistaDevolucao())
                 .dataCriacao(now)
                 .dataAtualizacao(now)
-                .status(LoanStatus.OPEN)
+                .status(LoanStatus.REQUESTED)
                 .build();
     }
 }

@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import br.com.jurispay.domain.loan.model.LoanPaymentPeriod;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -28,6 +30,12 @@ public class LoanRequest {
     @NotNull(message = "Valor solicitado é obrigatório")
     @Positive(message = "Valor solicitado deve ser maior que zero")
     private BigDecimal valorSolicitado;
+
+    @NotNull(message = "Taxa de juros é obrigatória")
+    private BigDecimal taxaJuros;
+
+    @NotNull(message = "Período de pagamento é obrigatório")
+    private LoanPaymentPeriod periodoPagamento;
 
     @NotNull(message = "Data prevista de devolução é obrigatória")
     private Instant dataPrevistaDevolucao;

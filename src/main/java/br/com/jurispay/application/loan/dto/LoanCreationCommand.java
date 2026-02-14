@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import br.com.jurispay.domain.loan.model.LoanPaymentPeriod;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -22,6 +24,8 @@ public class LoanCreationCommand {
 
     private Long customerId;
     private BigDecimal valorSolicitado;
+    private BigDecimal taxaJuros;
+    private LoanPaymentPeriod periodoPagamento;
     private Instant dataPrevistaDevolucao;
 }
 

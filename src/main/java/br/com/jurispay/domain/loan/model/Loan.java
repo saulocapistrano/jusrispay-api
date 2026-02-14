@@ -25,11 +25,52 @@ public class Loan {
     private BigDecimal valorDevolucaoPrevista;
     private BigDecimal taxaJuros;
     private BigDecimal multaDiaria;
+    private LoanPaymentPeriod periodoPagamento;
+    private Integer quantidadeParcelas;
+    private BigDecimal valorParcela;
     private Instant dataLiberacao;
     private Instant dataPrevistaDevolucao;
     private Instant dataCriacao;
     private Instant dataAtualizacao;
     private LoanStatus status;
+
+    public Loan approve(Instant now) {
+        return Loan.builder()
+                .id(this.id)
+                .customerId(this.customerId)
+                .valorSolicitado(this.valorSolicitado)
+                .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
+                .taxaJuros(this.taxaJuros)
+                .multaDiaria(this.multaDiaria)
+                .periodoPagamento(this.periodoPagamento)
+                .quantidadeParcelas(this.quantidadeParcelas)
+                .valorParcela(this.valorParcela)
+                .dataLiberacao(now)
+                .dataPrevistaDevolucao(this.dataPrevistaDevolucao)
+                .dataCriacao(this.dataCriacao)
+                .dataAtualizacao(now)
+                .status(LoanStatus.OPEN)
+                .build();
+    }
+
+    public Loan reject(Instant now) {
+        return Loan.builder()
+                .id(this.id)
+                .customerId(this.customerId)
+                .valorSolicitado(this.valorSolicitado)
+                .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
+                .taxaJuros(this.taxaJuros)
+                .multaDiaria(this.multaDiaria)
+                .periodoPagamento(this.periodoPagamento)
+                .quantidadeParcelas(this.quantidadeParcelas)
+                .valorParcela(this.valorParcela)
+                .dataLiberacao(null)
+                .dataPrevistaDevolucao(this.dataPrevistaDevolucao)
+                .dataCriacao(this.dataCriacao)
+                .dataAtualizacao(now)
+                .status(LoanStatus.REJECTED)
+                .build();
+    }
 
     /**
      * Marca o empréstimo como OVERDUE (em atraso).
@@ -45,6 +86,9 @@ public class Loan {
                 .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
                 .taxaJuros(this.taxaJuros)
                 .multaDiaria(this.multaDiaria)
+                .periodoPagamento(this.periodoPagamento)
+                .quantidadeParcelas(this.quantidadeParcelas)
+                .valorParcela(this.valorParcela)
                 .dataLiberacao(this.dataLiberacao)
                 .dataPrevistaDevolucao(this.dataPrevistaDevolucao)
                 .dataCriacao(this.dataCriacao)
@@ -67,11 +111,33 @@ public class Loan {
                 .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
                 .taxaJuros(this.taxaJuros)
                 .multaDiaria(this.multaDiaria)
+                .periodoPagamento(this.periodoPagamento)
+                .quantidadeParcelas(this.quantidadeParcelas)
+                .valorParcela(this.valorParcela)
                 .dataLiberacao(this.dataLiberacao)
                 .dataPrevistaDevolucao(this.dataPrevistaDevolucao)
                 .dataCriacao(this.dataCriacao)
                 .dataAtualizacao(Instant.now())
                 .status(LoanStatus.PAID)
+                .build();
+    }
+
+    public Loan applyRepaymentPlan(LoanPaymentPeriod periodoPagamento, Integer quantidadeParcelas, BigDecimal valorParcela) {
+        return Loan.builder()
+                .id(this.id)
+                .customerId(this.customerId)
+                .valorSolicitado(this.valorSolicitado)
+                .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
+                .taxaJuros(this.taxaJuros)
+                .multaDiaria(this.multaDiaria)
+                .periodoPagamento(periodoPagamento)
+                .quantidadeParcelas(quantidadeParcelas)
+                .valorParcela(valorParcela)
+                .dataLiberacao(this.dataLiberacao)
+                .dataPrevistaDevolucao(this.dataPrevistaDevolucao)
+                .dataCriacao(this.dataCriacao)
+                .dataAtualizacao(this.dataAtualizacao)
+                .status(this.status)
                 .build();
     }
 }

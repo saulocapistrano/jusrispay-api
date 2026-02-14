@@ -1,6 +1,7 @@
 package br.com.jurispay.infrastructure.persistence.jpa.entity;
 
 import br.com.jurispay.domain.loan.model.LoanStatus;
+import br.com.jurispay.domain.loan.model.LoanPaymentPeriod;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,7 +45,17 @@ public class LoanEntity {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal multaDiaria;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "periodo_pagamento", nullable = true, length = 20)
+    private LoanPaymentPeriod periodoPagamento;
+
+    @Column(name = "quantidade_parcelas", nullable = true)
+    private Integer quantidadeParcelas;
+
+    @Column(name = "valor_parcela", nullable = true, precision = 19, scale = 2)
+    private BigDecimal valorParcela;
+
+    @Column(nullable = true)
     private Instant dataLiberacao;
 
     @Column(nullable = false)
