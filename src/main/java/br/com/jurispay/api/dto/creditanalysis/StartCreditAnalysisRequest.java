@@ -15,8 +15,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class StartCreditAnalysisRequest {
 
-    @NotNull(message = "ID do cliente é obrigatório")
-    private Long customerId;
+    @NotNull(message = "ID do empréstimo é obrigatório")
+    private Long loanId;
 
     @NotNull(message = "ID do analista é obrigatório")
     private Long analystUserId;
