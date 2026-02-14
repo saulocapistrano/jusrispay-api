@@ -1,6 +1,6 @@
 package br.com.jurispay.domain.creditanalysis.service;
 
-import br.com.jurispay.domain.common.exception.ValidationException;
+import br.com.jurispay.domain.exception.common.ValidationException;
 import br.com.jurispay.domain.creditanalysis.model.CreditAnalysis;
 import br.com.jurispay.domain.creditanalysis.model.CreditAnalysisStatus;
 

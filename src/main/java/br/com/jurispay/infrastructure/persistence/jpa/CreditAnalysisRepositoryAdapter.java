@@ -48,6 +48,12 @@ public class CreditAnalysisRepositoryAdapter implements CreditAnalysisRepository
     }
 
     @Override
+    public Optional<CreditAnalysis> findByLoanId(Long loanId) {
+        return springDataCreditAnalysisRepository.findByLoanId(loanId)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public List<CreditAnalysis> findAll() {
         return springDataCreditAnalysisRepository.findAll().stream()
                 .map(mapper::toDomain)

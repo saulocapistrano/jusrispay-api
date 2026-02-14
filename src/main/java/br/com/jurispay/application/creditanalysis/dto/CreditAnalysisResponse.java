@@ -19,6 +19,8 @@ public class CreditAnalysisResponse {
 
     private Long id;
 
+    private Long loanId;
+
     private Long customerId;
 
     private CreditAnalysisStatus status;
