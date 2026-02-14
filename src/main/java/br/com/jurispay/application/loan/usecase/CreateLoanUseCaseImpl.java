@@ -2,13 +2,11 @@ package br.com.jurispay.application.loan.usecase;
 
 import br.com.jurispay.application.loan.dto.LoanCreationCommand;
 import br.com.jurispay.application.loan.dto.LoanResponse;
-import br.com.jurispay.application.loan.mapper.LoanApplicationMapper;
+import br.com.jurispay.application.loan.assembler.LoanResponseAssembler;
 import br.com.jurispay.application.loan.validator.LoanCreationCommandValidator;
-import br.com.jurispay.domain.common.exception.ErrorCode;
-import br.com.jurispay.domain.common.exception.NotFoundException;
-import br.com.jurispay.domain.common.exception.ValidationException;
-import br.com.jurispay.domain.creditanalysis.model.CreditAnalysisStatus;
-import br.com.jurispay.domain.creditanalysis.repository.CreditAnalysisRepository;
+import br.com.jurispay.domain.exception.common.NotFoundException;
+import br.com.jurispay.application.customer.service.CustomerKycService;
+import br.com.jurispay.domain.exception.common.ErrorCode;
 import br.com.jurispay.domain.customer.repository.CustomerRepository;
 import br.com.jurispay.domain.loan.factory.LoanCreationData;
 import br.com.jurispay.domain.loan.factory.LoanFactory;
@@ -27,27 +25,27 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
 
     private final LoanRepository loanRepository;
     private final CustomerRepository customerRepository;
-    private final CreditAnalysisRepository creditAnalysisRepository;
-    private final LoanApplicationMapper mapper;
+    private final LoanResponseAssembler responseAssembler;
     private final LoanCreationCommandValidator validator;
     private final LoanFactory loanFactory;
     private final LoanPolicy loanPolicy;
+    private final CustomerKycService customerKycService;
 
     public CreateLoanUseCaseImpl(
             LoanRepository loanRepository,
             CustomerRepository customerRepository,
-            CreditAnalysisRepository creditAnalysisRepository,
-            LoanApplicationMapper mapper,
+            LoanResponseAssembler responseAssembler,
             LoanCreationCommandValidator validator,
             LoanFactory loanFactory,
-            LoanPolicy loanPolicy) {
+            LoanPolicy loanPolicy,
+            CustomerKycService customerKycService) {
         this.loanRepository = loanRepository;
         this.customerRepository = customerRepository;
-        this.creditAnalysisRepository = creditAnalysisRepository;
-        this.mapper = mapper;
+        this.responseAssembler = responseAssembler;
         this.validator = validator;
         this.loanFactory = loanFactory;
         this.loanPolicy = loanPolicy;
+        this.customerKycService = customerKycService;
     }
 
     @Override
@@ -59,15 +57,15 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
         customerRepository.findById(command.getCustomerId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.CUSTOMER_NOT_FOUND, "Cliente não encontrado para criação de empréstimo."));
 
-        // Verificar se cliente está aprovado na análise de crédito
-        creditAnalysisRepository.findByCustomerId(command.getCustomerId())
-                .filter(analysis -> analysis.getStatus() == CreditAnalysisStatus.APPROVED)
-                .orElseThrow(() -> new ValidationException(ErrorCode.CUSTOMER_NOT_APPROVED, "Cliente não aprovado na análise de crédito."));
+        // Bloqueio por KYC renovável
+        customerKycService.validateCustomerEligibleForLoan(command.getCustomerId(), Instant.now());
 
         // Montar dados de criação
         LoanCreationData creationData = LoanCreationData.builder()
                 .customerId(command.getCustomerId())
                 .valorSolicitado(command.getValorSolicitado())
+                .taxaJuros(command.getTaxaJuros())
+                .periodoPagamento(command.getPeriodoPagamento())
                 .dataPrevistaDevolucao(command.getDataPrevistaDevolucao())
                 .build();
 
@@ -79,7 +77,7 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
         Loan savedLoan = loanRepository.save(loan);
 
         // Retornar resposta
-        return mapper.toResponse(savedLoan);
+        return responseAssembler.toResponse(savedLoan);
     }
 }
 

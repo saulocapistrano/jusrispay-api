@@ -19,5 +19,6 @@ public interface LoanRepository {
     List<Loan> findAll();
 
     List<Loan> findByStatus(LoanStatus status);
-}
 
+    List<Loan> findByCustomerId(Long customerId);
+}

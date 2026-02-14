@@ -45,11 +45,30 @@ public class Loan {
                 .periodoPagamento(this.periodoPagamento)
                 .quantidadeParcelas(this.quantidadeParcelas)
                 .valorParcela(this.valorParcela)
+                .dataLiberacao(null)
+                .dataPrevistaDevolucao(this.dataPrevistaDevolucao)
+                .dataCriacao(this.dataCriacao)
+                .dataAtualizacao(now)
+                .status(LoanStatus.APPROVED)
+                .build();
+    }
+
+    public Loan credit(Instant now) {
+        return Loan.builder()
+                .id(this.id)
+                .customerId(this.customerId)
+                .valorSolicitado(this.valorSolicitado)
+                .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
+                .taxaJuros(this.taxaJuros)
+                .multaDiaria(this.multaDiaria)
+                .periodoPagamento(this.periodoPagamento)
+                .quantidadeParcelas(this.quantidadeParcelas)
+                .valorParcela(this.valorParcela)
                 .dataLiberacao(now)
                 .dataPrevistaDevolucao(this.dataPrevistaDevolucao)
                 .dataCriacao(this.dataCriacao)
                 .dataAtualizacao(now)
-                .status(LoanStatus.OPEN)
+                .status(LoanStatus.CREDITED)
                 .build();
     }
 
