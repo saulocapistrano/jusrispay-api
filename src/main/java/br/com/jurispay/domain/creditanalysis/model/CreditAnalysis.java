@@ -20,6 +20,11 @@ public class CreditAnalysis {
     private Long id;
 
     /**
+     * ID do empréstimo (solicitação) sendo analisado.
+     */
+    private Long loanId;
+
+    /**
      * ID do cliente sendo analisado.
      */
     private Long customerId;

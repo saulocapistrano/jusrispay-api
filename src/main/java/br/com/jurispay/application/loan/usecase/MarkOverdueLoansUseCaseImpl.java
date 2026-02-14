@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 
 /**
  * Implementação do caso de uso para marcar empréstimos em atraso como OVERDUE.
@@ -25,14 +26,16 @@ public class MarkOverdueLoansUseCaseImpl implements MarkOverdueLoansUseCase {
 
     @Override
     public int markOverdue() {
-        // Buscar empréstimos com status OPEN
-        var openLoans = loanRepository.findByStatus(LoanStatus.OPEN);
+        // Buscar empréstimos ativos (OPEN legado + CREDITED)
+        var activeLoans = new ArrayList<Loan>();
+        activeLoans.addAll(loanRepository.findByStatus(LoanStatus.OPEN));
+        activeLoans.addAll(loanRepository.findByStatus(LoanStatus.CREDITED));
 
         Instant now = Instant.now();
         int updatedCount = 0;
 
         // Para cada empréstimo aberto, verificar se está em atraso
-        for (Loan loan : openLoans) {
+        for (Loan loan : activeLoans) {
             if (loan.getDataPrevistaDevolucao() != null
                     && loan.getDataPrevistaDevolucao().isBefore(now)) {
 

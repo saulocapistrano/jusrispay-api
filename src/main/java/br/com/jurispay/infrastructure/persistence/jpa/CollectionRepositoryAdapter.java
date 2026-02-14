@@ -7,6 +7,7 @@ import br.com.jurispay.infrastructure.persistence.jpa.repository.SpringDataColle
 import br.com.jurispay.infrastructure.persistence.mapper.CollectionEntityMapper;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,5 +48,12 @@ public class CollectionRepositoryAdapter implements CollectionRepository {
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
-}
 
+    @Override
+    public Optional<Instant> findLastActionAtByLoanIds(List<Long> loanIds) {
+        if (loanIds == null || loanIds.isEmpty()) {
+            return Optional.empty();
+        }
+        return springDataCollectionRepository.findMaxActionAtByLoanIds(loanIds);
+    }
+}

@@ -9,6 +9,7 @@ import br.com.jurispay.infrastructure.persistence.jpa.repository.SpringDataPayme
 import br.com.jurispay.infrastructure.persistence.mapper.PaymentEntityMapper;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -68,5 +69,12 @@ public class PaymentRepositoryAdapter implements PaymentRepository {
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
-}
 
+    @Override
+    public Optional<Instant> findLastPaymentAtByLoanIds(List<Long> loanIds) {
+        if (loanIds == null || loanIds.isEmpty()) {
+            return Optional.empty();
+        }
+        return springDataPaymentRepository.findMaxPaymentAtByLoanIds(loanIds);
+    }
+}

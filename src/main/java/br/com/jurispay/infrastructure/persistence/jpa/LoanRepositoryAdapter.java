@@ -68,5 +68,11 @@ public class LoanRepositoryAdapter implements LoanRepository {
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
-}
 
+    @Override
+    public List<Loan> findByCustomerId(Long customerId) {
+        return springDataLoanRepository.findByCustomer_Id(customerId).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+}

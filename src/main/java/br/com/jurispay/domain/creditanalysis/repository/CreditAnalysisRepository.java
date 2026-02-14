@@ -28,6 +28,14 @@ public interface CreditAnalysisRepository {
     Optional<CreditAnalysis> findById(Long id);
 
     /**
+     * Busca análise por ID do empréstimo.
+     *
+     * @param loanId ID do empréstimo
+     * @return análise encontrada ou Optional.empty()
+     */
+    Optional<CreditAnalysis> findByLoanId(Long loanId);
+
+    /**
      * Busca análise por ID do cliente.
      *
      * @param customerId ID do cliente

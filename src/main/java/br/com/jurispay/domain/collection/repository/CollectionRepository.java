@@ -34,5 +34,12 @@ public interface CollectionRepository {
      * @return lista de ações de cobrança
      */
     List<CollectionAction> findByLoanId(Long loanId);
-}
 
+    /**
+     * Busca a última data de ação de cobrança por lista de loanIds.
+     *
+     * @param loanIds lista de IDs de empréstimos
+     * @return última data de ação de cobrança ou Optional.empty()
+     */
+    Optional<java.time.Instant> findLastActionAtByLoanIds(List<Long> loanIds);
+}

@@ -27,7 +27,10 @@ public class CreditAnalysisEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "customer_id", nullable = false, unique = true)
+    @Column(name = "loan_id")
+    private Long loanId;
+
+    @Column(name = "customer_id", nullable = false)
     private Long customerId;
 
     @Column(name = "analyst_user_id", nullable = false)

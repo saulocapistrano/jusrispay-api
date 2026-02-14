@@ -2,8 +2,8 @@ package br.com.jurispay.application.payment.validator;
 
 import br.com.jurispay.application.common.validator.CommandValidator;
 import br.com.jurispay.application.payment.dto.PaymentRegistrationCommand;
-import br.com.jurispay.domain.common.exception.ErrorCode;
-import br.com.jurispay.domain.common.exception.ValidationException;
+import br.com.jurispay.domain.exception.common.ErrorCode;
+import br.com.jurispay.domain.exception.common.ValidationException;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

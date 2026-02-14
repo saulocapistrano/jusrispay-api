@@ -2,8 +2,8 @@ package br.com.jurispay.application.document.validator;
 
 import br.com.jurispay.application.common.validator.CommandValidator;
 import br.com.jurispay.application.document.dto.DocumentValidationCommand;
-import br.com.jurispay.domain.common.exception.ErrorCode;
-import br.com.jurispay.domain.common.exception.ValidationException;
+import br.com.jurispay.domain.exception.common.ErrorCode;
+import br.com.jurispay.domain.exception.common.ValidationException;
 import br.com.jurispay.domain.document.model.DocumentStatus;
 import org.springframework.stereotype.Component;
 
