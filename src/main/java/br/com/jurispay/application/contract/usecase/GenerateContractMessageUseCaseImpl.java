@@ -1,7 +1,7 @@
 package br.com.jurispay.application.contract.usecase;
 
 import br.com.jurispay.application.contract.dto.ContractMessageResponse;
-import br.com.jurispay.domain.common.exception.NotFoundException;
+import br.com.jurispay.domain.exception.common.NotFoundException;
 import br.com.jurispay.domain.loan.model.Loan;
 import br.com.jurispay.domain.loan.repository.LoanRepository;
 import org.springframework.stereotype.Service;

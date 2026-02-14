@@ -2,7 +2,7 @@ package br.com.jurispay.application.document.usecase;
 
 import br.com.jurispay.application.document.dto.DocumentResponse;
 import br.com.jurispay.application.document.mapper.DocumentApplicationMapper;
-import br.com.jurispay.domain.common.exception.NotFoundException;
+import br.com.jurispay.domain.exception.common.NotFoundException;
 import br.com.jurispay.domain.document.repository.DocumentRepository;
 import org.springframework.stereotype.Service;
 

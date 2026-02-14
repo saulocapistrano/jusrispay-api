@@ -4,13 +4,11 @@ import br.com.jurispay.application.document.dto.DocumentResponse;
 import br.com.jurispay.application.document.dto.DocumentValidationCommand;
 import br.com.jurispay.application.document.mapper.DocumentApplicationMapper;
 import br.com.jurispay.application.document.validator.DocumentValidationCommandValidator;
-import br.com.jurispay.domain.common.exception.ErrorCode;
-import br.com.jurispay.domain.common.exception.NotFoundException;
+import br.com.jurispay.domain.exception.common.ErrorCode;
+import br.com.jurispay.domain.exception.common.NotFoundException;
 import br.com.jurispay.domain.document.model.Document;
 import br.com.jurispay.domain.document.repository.DocumentRepository;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
 
 /**
  * Implementação do use case de validação de documentos.
