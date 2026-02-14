@@ -1,7 +1,7 @@
 package br.com.jurispay.application.collection.usecase;
 
 import br.com.jurispay.application.collection.dto.OverdueInfoResponse;
-import br.com.jurispay.domain.common.exception.NotFoundException;
+import br.com.jurispay.domain.exception.common.NotFoundException;
 import br.com.jurispay.domain.collection.model.OverdueInfo;
 import br.com.jurispay.domain.collection.service.OverdueCalculator;
 import br.com.jurispay.domain.loan.model.Loan;
