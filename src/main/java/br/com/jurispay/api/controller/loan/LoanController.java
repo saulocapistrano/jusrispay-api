@@ -4,6 +4,7 @@ import br.com.jurispay.api.dto.loan.LoanRequest;
 import br.com.jurispay.api.mapper.loan.LoanRequestToCommandMapper;
 import br.com.jurispay.application.loan.dto.LoanResponse;
 import br.com.jurispay.application.loan.usecase.CreateLoanUseCase;
+import br.com.jurispay.application.loan.usecase.CreditLoanUseCase;
 import br.com.jurispay.application.loan.usecase.GetLoanByIdUseCase;
 import br.com.jurispay.application.loan.usecase.ListLoansUseCase;
 import jakarta.validation.Valid;
@@ -25,16 +26,19 @@ public class LoanController {
     private final CreateLoanUseCase createLoanUseCase;
     private final GetLoanByIdUseCase getLoanByIdUseCase;
     private final ListLoansUseCase listLoansUseCase;
+    private final CreditLoanUseCase creditLoanUseCase;
     private final LoanRequestToCommandMapper requestMapper;
 
     public LoanController(
             CreateLoanUseCase createLoanUseCase,
             GetLoanByIdUseCase getLoanByIdUseCase,
             ListLoansUseCase listLoansUseCase,
+            CreditLoanUseCase creditLoanUseCase,
             LoanRequestToCommandMapper requestMapper) {
         this.createLoanUseCase = createLoanUseCase;
         this.getLoanByIdUseCase = getLoanByIdUseCase;
         this.listLoansUseCase = listLoansUseCase;
+        this.creditLoanUseCase = creditLoanUseCase;
         this.requestMapper = requestMapper;
     }
 
@@ -64,5 +68,10 @@ public class LoanController {
         List<LoanResponse> loans = listLoansUseCase.listAll();
         return ResponseEntity.ok(loans);
     }
-}
 
+    @PostMapping("/{id}/credit")
+    public ResponseEntity<LoanResponse> credit(@PathVariable Long id) {
+        LoanResponse response = creditLoanUseCase.credit(id);
+        return ResponseEntity.ok(response);
+    }
+}

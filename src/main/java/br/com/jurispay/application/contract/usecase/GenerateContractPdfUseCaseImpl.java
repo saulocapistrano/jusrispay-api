@@ -1,7 +1,7 @@
 package br.com.jurispay.application.contract.usecase;
 
 import br.com.jurispay.application.contract.dto.ContractGenerationResponse;
-import br.com.jurispay.domain.common.exception.NotFoundException;
+import br.com.jurispay.domain.exception.common.NotFoundException;
 import br.com.jurispay.domain.document.model.Document;
 import br.com.jurispay.domain.document.model.DocumentStatus;
 import br.com.jurispay.domain.document.model.DocumentType;

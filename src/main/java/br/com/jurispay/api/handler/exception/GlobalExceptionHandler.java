@@ -1,9 +1,9 @@
 package br.com.jurispay.api.handler.exception;
 
 import br.com.jurispay.api.dto.common.ErrorResponse;
-import br.com.jurispay.domain.common.exception.BusinessException;
-import br.com.jurispay.domain.common.exception.NotFoundException;
-import br.com.jurispay.domain.common.exception.ValidationException;
+import br.com.jurispay.domain.exception.common.BusinessException;
+import br.com.jurispay.domain.exception.common.NotFoundException;
+import br.com.jurispay.domain.exception.common.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

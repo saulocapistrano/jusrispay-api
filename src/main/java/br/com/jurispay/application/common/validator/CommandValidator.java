@@ -1,6 +1,6 @@
 package br.com.jurispay.application.common.validator;
 
-import br.com.jurispay.domain.common.exception.ValidationException;
+import br.com.jurispay.domain.exception.common.ValidationException;
 
 /**
  * Interface genérica para validação de comandos.
