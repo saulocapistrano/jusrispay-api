@@ -56,7 +56,7 @@ public class ReportRepositoryAdapter implements ReportRepository {
         BigDecimal roiPercent = roiCalculator.calculateRoiPercent(totalProfit, totalLoaned);
 
         // Contagens por status
-        Long openLoans = countLoansByStatus(LoanStatus.OPEN);
+        Long openLoans = countLoansByStatus(LoanStatus.OPEN) + countLoansByStatus(LoanStatus.CREDITED);
         Long overdueLoans = countLoansByStatus(LoanStatus.OVERDUE);
         Long paidLoans = countLoansByStatus(LoanStatus.PAID);
 
@@ -76,12 +76,13 @@ public class ReportRepositoryAdapter implements ReportRepository {
     @Override
     public List<DueLoanItem> listNextDueLoans(Instant now, int limit) {
         String jpql = "SELECT l FROM LoanEntity l " +
-                "WHERE l.status = :status " +
+                "WHERE (l.status = :openStatus OR l.status = :creditedStatus) " +
                 "AND l.dataPrevistaDevolucao >= :now " +
                 "ORDER BY l.dataPrevistaDevolucao ASC";
 
         TypedQuery<LoanEntity> query = entityManager.createQuery(jpql, LoanEntity.class);
-        query.setParameter("status", LoanStatus.OPEN);
+        query.setParameter("openStatus", LoanStatus.OPEN);
+        query.setParameter("creditedStatus", LoanStatus.CREDITED);
         query.setParameter("now", now);
         query.setMaxResults(limit);
 
@@ -93,12 +94,13 @@ public class ReportRepositoryAdapter implements ReportRepository {
     @Override
     public List<OverdueLoanItem> listOverdueLoans(Instant now, int limit) {
         String jpql = "SELECT l FROM LoanEntity l " +
-                "WHERE (l.status = :overdueStatus OR (l.status = :openStatus AND l.dataPrevistaDevolucao < :now)) " +
+                "WHERE (l.status = :overdueStatus OR ((l.status = :openStatus OR l.status = :creditedStatus) AND l.dataPrevistaDevolucao < :now)) " +
                 "ORDER BY l.dataPrevistaDevolucao ASC";
 
         TypedQuery<LoanEntity> query = entityManager.createQuery(jpql, LoanEntity.class);
         query.setParameter("overdueStatus", LoanStatus.OVERDUE);
         query.setParameter("openStatus", LoanStatus.OPEN);
+        query.setParameter("creditedStatus", LoanStatus.CREDITED);
         query.setParameter("now", now);
         query.setMaxResults(limit);
 

@@ -3,7 +3,7 @@ package br.com.jurispay.application.document.usecase;
 import br.com.jurispay.application.document.dto.DocumentResponse;
 import br.com.jurispay.application.document.dto.DocumentValidationCommand;
 import br.com.jurispay.application.document.mapper.DocumentApplicationMapper;
-import br.com.jurispay.domain.common.exception.NotFoundException;
+import br.com.jurispay.domain.exception.common.NotFoundException;
 import br.com.jurispay.domain.document.model.Document;
 import br.com.jurispay.domain.document.model.DocumentStatus;
 import br.com.jurispay.domain.document.model.DocumentType;

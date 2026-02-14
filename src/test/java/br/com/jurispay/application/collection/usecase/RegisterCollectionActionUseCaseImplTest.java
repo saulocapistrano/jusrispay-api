@@ -1,14 +1,7 @@
 package br.com.jurispay.application.collection.usecase;
 
-import br.com.jurispay.application.collection.dto.CollectionActionCommand;
-import br.com.jurispay.application.collection.dto.CollectionActionResponse;
 import br.com.jurispay.application.collection.mapper.CollectionApplicationMapper;
-import br.com.jurispay.domain.collection.model.CollectionAction;
-import br.com.jurispay.domain.collection.model.CollectionChannel;
 import br.com.jurispay.domain.collection.repository.CollectionRepository;
-import br.com.jurispay.domain.common.exception.NotFoundException;
-import br.com.jurispay.domain.common.exception.ValidationException;
-import br.com.jurispay.domain.loan.model.Loan;
 import br.com.jurispay.domain.loan.repository.LoanRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,12 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Instant;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 /**
  * Testes para RegisterCollectionActionUseCaseImpl.

@@ -1,14 +1,7 @@
 package br.com.jurispay.application.creditanalysis.usecase;
 
-import br.com.jurispay.application.creditanalysis.dto.CreditAnalysisResponse;
-import br.com.jurispay.application.creditanalysis.dto.StartCreditAnalysisCommand;
 import br.com.jurispay.application.creditanalysis.mapper.CreditAnalysisApplicationMapper;
-import br.com.jurispay.domain.common.exception.NotFoundException;
-import br.com.jurispay.domain.common.exception.ValidationException;
-import br.com.jurispay.domain.creditanalysis.model.CreditAnalysis;
-import br.com.jurispay.domain.creditanalysis.model.CreditAnalysisStatus;
 import br.com.jurispay.domain.creditanalysis.repository.CreditAnalysisRepository;
-import br.com.jurispay.domain.customer.model.Customer;
 import br.com.jurispay.domain.customer.repository.CustomerRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,12 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Instant;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 /**
  * Testes para StartCreditAnalysisUseCaseImpl.
