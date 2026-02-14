@@ -1,7 +1,6 @@
 package br.com.jurispay.application.auth.usecase;
 
 import br.com.jurispay.api.dto.auth.TokenResponse;
-import br.com.jurispay.domain.common.exception.ValidationException;
 import br.com.jurispay.infrastructure.config.security.JwtConfig;
 import br.com.jurispay.infrastructure.security.auth.JwtTokenService;
 import org.springframework.security.authentication.AuthenticationManager;
