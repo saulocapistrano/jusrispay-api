@@ -6,7 +6,7 @@ import br.com.jurispay.application.creditanalysis.dto.CreditAnalysisDecisionComm
 import br.com.jurispay.application.creditanalysis.dto.CreditAnalysisResponse;
 import br.com.jurispay.application.creditanalysis.dto.StartCreditAnalysisCommand;
 import br.com.jurispay.application.creditanalysis.usecase.DecideCreditAnalysisUseCase;
-import br.com.jurispay.application.creditanalysis.usecase.GetCreditAnalysisByCustomerUseCase;
+import br.com.jurispay.application.creditanalysis.usecase.GetCreditAnalysisByLoanUseCase;
 import br.com.jurispay.application.creditanalysis.usecase.StartCreditAnalysisUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -25,21 +25,21 @@ public class CreditAnalysisController {
 
     private final StartCreditAnalysisUseCase startCreditAnalysisUseCase;
     private final DecideCreditAnalysisUseCase decideCreditAnalysisUseCase;
-    private final GetCreditAnalysisByCustomerUseCase getCreditAnalysisByCustomerUseCase;
+    private final GetCreditAnalysisByLoanUseCase getCreditAnalysisByLoanUseCase;
 
     public CreditAnalysisController(
             StartCreditAnalysisUseCase startCreditAnalysisUseCase,
             DecideCreditAnalysisUseCase decideCreditAnalysisUseCase,
-            GetCreditAnalysisByCustomerUseCase getCreditAnalysisByCustomerUseCase) {
+            GetCreditAnalysisByLoanUseCase getCreditAnalysisByLoanUseCase) {
         this.startCreditAnalysisUseCase = startCreditAnalysisUseCase;
         this.decideCreditAnalysisUseCase = decideCreditAnalysisUseCase;
-        this.getCreditAnalysisByCustomerUseCase = getCreditAnalysisByCustomerUseCase;
+        this.getCreditAnalysisByLoanUseCase = getCreditAnalysisByLoanUseCase;
     }
 
     @PostMapping("/start")
     public ResponseEntity<CreditAnalysisResponse> start(@Valid @RequestBody StartCreditAnalysisRequest request) {
         StartCreditAnalysisCommand command = StartCreditAnalysisCommand.builder()
-                .customerId(request.getCustomerId())
+                .loanId(request.getLoanId())
                 .analystUserId(request.getAnalystUserId())
                 .build();
 
@@ -47,8 +47,8 @@ public class CreditAnalysisController {
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
-                .path("/../by-customer/{customerId}")
-                .buildAndExpand(response.getCustomerId())
+                .path("/../by-loan/{loanId}")
+                .buildAndExpand(response.getLoanId())
                 .toUri();
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -56,12 +56,12 @@ public class CreditAnalysisController {
                 .body(response);
     }
 
-    @PostMapping("/decision/{customerId}")
+    @PostMapping("/decision/{loanId}")
     public ResponseEntity<CreditAnalysisResponse> decide(
-            @PathVariable Long customerId,
+            @PathVariable Long loanId,
             @Valid @RequestBody CreditAnalysisDecisionRequest request) {
         CreditAnalysisDecisionCommand command = CreditAnalysisDecisionCommand.builder()
-                .customerId(customerId)
+                .loanId(loanId)
                 .analystUserId(request.getAnalystUserId())
                 .decisionStatus(request.getDecisionStatus())
                 .rejectionReason(request.getRejectionReason())
@@ -73,9 +73,9 @@ public class CreditAnalysisController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/by-customer/{customerId}")
-    public ResponseEntity<CreditAnalysisResponse> getByCustomer(@PathVariable Long customerId) {
-        CreditAnalysisResponse response = getCreditAnalysisByCustomerUseCase.getByCustomerId(customerId);
+    @GetMapping("/by-loan/{loanId}")
+    public ResponseEntity<CreditAnalysisResponse> getByLoan(@PathVariable Long loanId) {
+        CreditAnalysisResponse response = getCreditAnalysisByLoanUseCase.getByLoanId(loanId);
         return ResponseEntity.ok(response);
     }
 }
