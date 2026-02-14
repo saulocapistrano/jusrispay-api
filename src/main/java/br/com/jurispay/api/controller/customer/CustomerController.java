@@ -2,7 +2,9 @@ package br.com.jurispay.api.controller.customer;
 
 import br.com.jurispay.api.dto.customer.CustomerRequest;
 import br.com.jurispay.application.customer.dto.CustomerRegistrationCommand;
+import br.com.jurispay.application.customer.dto.CustomerKycStatusResponse;
 import br.com.jurispay.application.customer.dto.CustomerResponse;
+import br.com.jurispay.application.customer.usecase.GetCustomerKycStatusUseCase;
 import br.com.jurispay.application.customer.usecase.GetCustomerByIdUseCase;
 import br.com.jurispay.application.customer.usecase.ListCustomersUseCase;
 import br.com.jurispay.application.customer.usecase.RegisterCustomerUseCase;
@@ -25,14 +27,17 @@ public class CustomerController {
     private final RegisterCustomerUseCase registerUseCase;
     private final GetCustomerByIdUseCase getByIdUseCase;
     private final ListCustomersUseCase listCustomersUseCase;
+    private final GetCustomerKycStatusUseCase getCustomerKycStatusUseCase;
 
     public CustomerController(
             RegisterCustomerUseCase registerUseCase,
             GetCustomerByIdUseCase getByIdUseCase,
-            ListCustomersUseCase listCustomersUseCase) {
+            ListCustomersUseCase listCustomersUseCase,
+            GetCustomerKycStatusUseCase getCustomerKycStatusUseCase) {
         this.registerUseCase = registerUseCase;
         this.getByIdUseCase = getByIdUseCase;
         this.listCustomersUseCase = listCustomersUseCase;
+        this.getCustomerKycStatusUseCase = getCustomerKycStatusUseCase;
     }
 
     @PostMapping
@@ -90,5 +95,10 @@ public class CustomerController {
         List<CustomerResponse> customers = listCustomersUseCase.listAll();
         return ResponseEntity.ok(customers);
     }
-}
 
+    @GetMapping("/{id}/kyc")
+    public ResponseEntity<CustomerKycStatusResponse> getKycStatus(@PathVariable Long id) {
+        CustomerKycStatusResponse response = getCustomerKycStatusUseCase.getStatus(id);
+        return ResponseEntity.ok(response);
+    }
+}
