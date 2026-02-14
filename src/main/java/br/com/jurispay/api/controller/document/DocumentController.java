@@ -8,7 +8,7 @@ import br.com.jurispay.application.document.usecase.GetDocumentByIdUseCase;
 import br.com.jurispay.application.document.usecase.ListDocumentsUseCase;
 import br.com.jurispay.application.document.usecase.UploadDocumentUseCase;
 import br.com.jurispay.application.document.usecase.ValidateDocumentUseCase;
-import br.com.jurispay.domain.common.exception.NotFoundException;
+import br.com.jurispay.domain.exception.common.NotFoundException;
 import br.com.jurispay.domain.document.model.Document;
 import br.com.jurispay.domain.document.model.DocumentType;
 import br.com.jurispay.domain.document.repository.DocumentRepository;
