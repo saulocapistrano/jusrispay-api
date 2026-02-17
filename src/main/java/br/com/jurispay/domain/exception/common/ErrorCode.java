@@ -18,6 +18,7 @@ public enum ErrorCode {
     CUSTOMER_NOT_FOUND("CUSTOMER_NOT_FOUND", "Cliente não encontrado"),
     LOAN_NOT_FOUND("LOAN_NOT_FOUND", "Empréstimo não encontrado"),
     PAYMENT_NOT_FOUND("PAYMENT_NOT_FOUND", "Pagamento não encontrado"),
+    RECEIVABLE_NOT_FOUND("RECEIVABLE_NOT_FOUND", "Recebível/Parcela não encontrada"),
     DOCUMENT_NOT_FOUND("DOCUMENT_NOT_FOUND", "Documento não encontrado"),
     CREDIT_ANALYSIS_NOT_FOUND("CREDIT_ANALYSIS_NOT_FOUND", "Análise de crédito não encontrada"),
 
