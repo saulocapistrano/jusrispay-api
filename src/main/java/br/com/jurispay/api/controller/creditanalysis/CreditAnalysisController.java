@@ -66,6 +66,8 @@ public class CreditAnalysisController {
                 .decisionStatus(request.getDecisionStatus())
                 .rejectionReason(request.getRejectionReason())
                 .notes(request.getNotes())
+                .overrideCreditCheck(request.getOverrideCreditCheck())
+                .overrideReason(request.getOverrideReason())
                 .build();
 
         CreditAnalysisResponse response = decideCreditAnalysisUseCase.decide(command);

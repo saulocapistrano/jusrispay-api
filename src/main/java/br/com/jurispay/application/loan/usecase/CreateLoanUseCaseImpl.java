@@ -11,6 +11,7 @@ import br.com.jurispay.domain.customer.repository.CustomerRepository;
 import br.com.jurispay.domain.loan.factory.LoanCreationData;
 import br.com.jurispay.domain.loan.factory.LoanFactory;
 import br.com.jurispay.domain.loan.model.Loan;
+import br.com.jurispay.domain.loan.model.LoanStatus;
 import br.com.jurispay.domain.loan.policy.LoanPolicy;
 import br.com.jurispay.domain.loan.repository.LoanRepository;
 import org.springframework.stereotype.Service;
@@ -58,7 +59,14 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.CUSTOMER_NOT_FOUND, "Cliente não encontrado para criação de empréstimo."));
 
         // Bloqueio por KYC renovável
-        customerKycService.validateCustomerEligibleForLoan(command.getCustomerId(), Instant.now());
+        boolean allowKycIncomplete = Boolean.TRUE.equals(command.getAllowKycIncomplete());
+        try {
+            customerKycService.validateCustomerEligibleForLoan(command.getCustomerId(), Instant.now());
+        } catch (br.com.jurispay.domain.exception.common.ValidationException ex) {
+            if (!allowKycIncomplete) {
+                throw ex;
+            }
+        }
 
         // Montar dados de criação
         LoanCreationData creationData = LoanCreationData.builder()
@@ -72,6 +80,25 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
         // Criar Loan usando factory
         Instant now = Instant.now();
         Loan loan = loanFactory.create(creationData, loanPolicy, now);
+
+        if (allowKycIncomplete) {
+            loan = Loan.builder()
+                    .id(loan.getId())
+                    .customerId(loan.getCustomerId())
+                    .valorSolicitado(loan.getValorSolicitado())
+                    .valorDevolucaoPrevista(loan.getValorDevolucaoPrevista())
+                    .taxaJuros(loan.getTaxaJuros())
+                    .multaDiaria(loan.getMultaDiaria())
+                    .periodoPagamento(loan.getPeriodoPagamento())
+                    .quantidadeParcelas(loan.getQuantidadeParcelas())
+                    .valorParcela(loan.getValorParcela())
+                    .dataLiberacao(loan.getDataLiberacao())
+                    .dataPrevistaDevolucao(loan.getDataPrevistaDevolucao())
+                    .dataCriacao(loan.getDataCriacao())
+                    .dataAtualizacao(now)
+                    .status(LoanStatus.PENDING_DOCUMENTS)
+                    .build();
+        }
 
         // Salvar empréstimo
         Loan savedLoan = loanRepository.save(loan);

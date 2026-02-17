@@ -1,5 +1,6 @@
 package br.com.jurispay.application.creditanalysis.dto;
 
+import br.com.jurispay.application.creditcheck.dto.CreditCheckSummaryDto;
 import br.com.jurispay.domain.creditanalysis.model.CreditAnalysisStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,5 +37,7 @@ public class CreditAnalysisResponse {
     private String rejectionReason;
 
     private String notes;
+
+    private CreditCheckSummaryDto creditCheckSummary;
 }
 

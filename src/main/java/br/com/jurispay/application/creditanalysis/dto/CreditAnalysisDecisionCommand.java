@@ -35,5 +35,9 @@ public class CreditAnalysisDecisionCommand {
      * Observações sobre a decisão.
      */
     private String notes;
+
+    private Boolean overrideCreditCheck;
+
+    private String overrideReason;
 }
 

@@ -39,5 +39,7 @@ public class LoanRequest {
 
     @NotNull(message = "Data prevista de devolução é obrigatória")
     private Instant dataPrevistaDevolucao;
+
+    private Boolean allowKycIncomplete;
 }
 

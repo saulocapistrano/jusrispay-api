@@ -4,6 +4,7 @@ import br.com.jurispay.application.creditanalysis.dto.CreditAnalysisResponse;
 import br.com.jurispay.application.creditanalysis.dto.StartCreditAnalysisCommand;
 import br.com.jurispay.application.creditanalysis.mapper.CreditAnalysisApplicationMapper;
 import br.com.jurispay.application.creditanalysis.validator.StartCreditAnalysisCommandValidator;
+import br.com.jurispay.application.creditcheck.usecase.GetLatestCreditCheckByLoanUseCase;
 import br.com.jurispay.domain.exception.common.ErrorCode;
 import br.com.jurispay.domain.exception.common.NotFoundException;
 import br.com.jurispay.domain.exception.common.ValidationException;
@@ -28,16 +29,19 @@ public class StartCreditAnalysisUseCaseImpl implements StartCreditAnalysisUseCas
     private final LoanRepository loanRepository;
     private final CreditAnalysisApplicationMapper mapper;
     private final StartCreditAnalysisCommandValidator validator;
+    private final GetLatestCreditCheckByLoanUseCase getLatestCreditCheckByLoanUseCase;
 
     public StartCreditAnalysisUseCaseImpl(
             CreditAnalysisRepository creditAnalysisRepository,
             LoanRepository loanRepository,
             CreditAnalysisApplicationMapper mapper,
-            StartCreditAnalysisCommandValidator validator) {
+            StartCreditAnalysisCommandValidator validator,
+            GetLatestCreditCheckByLoanUseCase getLatestCreditCheckByLoanUseCase) {
         this.creditAnalysisRepository = creditAnalysisRepository;
         this.loanRepository = loanRepository;
         this.mapper = mapper;
         this.validator = validator;
+        this.getLatestCreditCheckByLoanUseCase = getLatestCreditCheckByLoanUseCase;
     }
 
     @Override
@@ -102,7 +106,28 @@ public class StartCreditAnalysisUseCaseImpl implements StartCreditAnalysisUseCas
         CreditAnalysis savedAnalysis = creditAnalysisRepository.save(analysis);
 
         // Retornar response
-        return mapper.toResponse(savedAnalysis);
+        CreditAnalysisResponse response = mapper.toResponse(savedAnalysis);
+        return enrichWithCreditCheckSummary(response);
+    }
+
+    private CreditAnalysisResponse enrichWithCreditCheckSummary(CreditAnalysisResponse response) {
+        if (response == null || response.getLoanId() == null) {
+            return response;
+        }
+
+        return CreditAnalysisResponse.builder()
+                .id(response.getId())
+                .loanId(response.getLoanId())
+                .customerId(response.getCustomerId())
+                .status(response.getStatus())
+                .analystUserId(response.getAnalystUserId())
+                .startedAt(response.getStartedAt())
+                .finishedAt(response.getFinishedAt())
+                .decisionDeadlineAt(response.getDecisionDeadlineAt())
+                .rejectionReason(response.getRejectionReason())
+                .notes(response.getNotes())
+                .creditCheckSummary(getLatestCreditCheckByLoanUseCase.getByLoanId(response.getLoanId()).orElse(null))
+                .build();
     }
 }
 

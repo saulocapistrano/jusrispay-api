@@ -1,10 +1,17 @@
 package br.com.jurispay.application.creditanalysis.usecase;
 
+import br.com.jurispay.application.creditcheck.usecase.RunCreditCheckUseCase;
+import br.com.jurispay.application.creditcheck.usecase.GetLatestCreditCheckByLoanUseCase;
 import br.com.jurispay.application.creditanalysis.dto.CreditAnalysisDecisionCommand;
 import br.com.jurispay.application.creditanalysis.dto.CreditAnalysisResponse;
 import br.com.jurispay.application.creditanalysis.mapper.CreditAnalysisApplicationMapper;
 import br.com.jurispay.application.creditanalysis.service.CreditAnalysisDecisionValidator;
 import br.com.jurispay.application.customer.service.CustomerKycService;
+import br.com.jurispay.domain.creditcheck.model.CreditCheckDecision;
+import br.com.jurispay.domain.creditcheck.model.CreditCheckStatus;
+import br.com.jurispay.domain.creditdecisionoverride.model.CreditDecisionOverride;
+import br.com.jurispay.domain.creditdecisionoverride.repository.CreditDecisionOverrideRepository;
+import br.com.jurispay.domain.customer.repository.CustomerRepository;
 import br.com.jurispay.domain.exception.common.ErrorCode;
 import br.com.jurispay.domain.exception.common.NotFoundException;
 import br.com.jurispay.domain.exception.common.ValidationException;
@@ -12,9 +19,11 @@ import br.com.jurispay.domain.creditanalysis.model.CreditAnalysis;
 import br.com.jurispay.domain.creditanalysis.model.CreditAnalysisStatus;
 import br.com.jurispay.domain.creditanalysis.repository.CreditAnalysisRepository;
 import br.com.jurispay.domain.loan.model.Loan;
-import br.com.jurispay.domain.loan.model.LoanPaymentPeriod;
 import br.com.jurispay.domain.loan.model.LoanStatus;
 import br.com.jurispay.domain.loan.repository.LoanRepository;
+import br.com.jurispay.domain.loan.service.InstallmentScheduleService;
+import br.com.jurispay.domain.loantype.model.LoanType;
+import br.com.jurispay.domain.loantype.repository.LoanTypeRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -22,7 +31,6 @@ import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 
 /**
  * Implementação do use case de decisão de análise de crédito.
@@ -32,21 +40,39 @@ public class DecideCreditAnalysisUseCaseImpl implements DecideCreditAnalysisUseC
 
     private final CreditAnalysisRepository creditAnalysisRepository;
     private final LoanRepository loanRepository;
+    private final LoanTypeRepository loanTypeRepository;
     private final CreditAnalysisDecisionValidator decisionValidator;
     private final CreditAnalysisApplicationMapper mapper;
     private final CustomerKycService customerKycService;
+    private final InstallmentScheduleService scheduleService;
+    private final CustomerRepository customerRepository;
+    private final RunCreditCheckUseCase runCreditCheckUseCase;
+    private final GetLatestCreditCheckByLoanUseCase getLatestCreditCheckByLoanUseCase;
+    private final CreditDecisionOverrideRepository creditDecisionOverrideRepository;
 
     public DecideCreditAnalysisUseCaseImpl(
             CreditAnalysisRepository creditAnalysisRepository,
             LoanRepository loanRepository,
+            LoanTypeRepository loanTypeRepository,
             CreditAnalysisDecisionValidator decisionValidator,
             CreditAnalysisApplicationMapper mapper,
-            CustomerKycService customerKycService) {
+            CustomerKycService customerKycService,
+            InstallmentScheduleService scheduleService,
+            CustomerRepository customerRepository,
+            RunCreditCheckUseCase runCreditCheckUseCase,
+            GetLatestCreditCheckByLoanUseCase getLatestCreditCheckByLoanUseCase,
+            CreditDecisionOverrideRepository creditDecisionOverrideRepository) {
         this.creditAnalysisRepository = creditAnalysisRepository;
         this.loanRepository = loanRepository;
+        this.loanTypeRepository = loanTypeRepository;
         this.decisionValidator = decisionValidator;
         this.mapper = mapper;
         this.customerKycService = customerKycService;
+        this.scheduleService = scheduleService;
+        this.customerRepository = customerRepository;
+        this.runCreditCheckUseCase = runCreditCheckUseCase;
+        this.getLatestCreditCheckByLoanUseCase = getLatestCreditCheckByLoanUseCase;
+        this.creditDecisionOverrideRepository = creditDecisionOverrideRepository;
     }
 
     @Override
@@ -116,23 +142,82 @@ public class DecideCreditAnalysisUseCaseImpl implements DecideCreditAnalysisUseC
         CreditAnalysis savedAnalysis = creditAnalysisRepository.save(updatedAnalysis);
 
         // Aplicar decisão no empréstimo
-        Loan updatedLoan = command.getDecisionStatus() == CreditAnalysisStatus.APPROVED
-                ? approveLoanWithRepaymentPlan(loan, now)
-                : loan.reject(now);
+        Loan updatedLoan;
+        if (command.getDecisionStatus() == CreditAnalysisStatus.APPROVED) {
+            String cpf = customerRepository.findById(loan.getCustomerId())
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.CUSTOMER_NOT_FOUND, "Cliente não encontrado."))
+                    .getCpf();
+
+            runCreditCheckUseCase.run(loan.getId(), loan.getCustomerId(), cpf, command.getAnalystUserId());
+
+            var creditCheckSummaryOpt = getLatestCreditCheckByLoanUseCase.getByLoanId(loan.getId());
+            if (creditCheckSummaryOpt.isEmpty()) {
+                throw new ValidationException(ErrorCode.BUSINESS_RULE_VIOLATION, "Credit check não encontrado para o empréstimo. Não é possível aprovar sem override.");
+            }
+
+            var creditCheckSummary = creditCheckSummaryOpt.get();
+            boolean requiresOverride = creditCheckSummary.getStatus() != CreditCheckStatus.COMPLETED
+                    || creditCheckSummary.getDecision() == CreditCheckDecision.REJECTED;
+
+            if (requiresOverride) {
+                boolean override = Boolean.TRUE.equals(command.getOverrideCreditCheck());
+                if (!override) {
+                    throw new ValidationException(ErrorCode.BUSINESS_RULE_VIOLATION, "Credit check reprovado/inconclusivo. Para aprovar é necessário override com motivo.");
+                }
+
+                String reason = command.getOverrideReason();
+                if (reason == null || reason.isBlank()) {
+                    throw new ValidationException(ErrorCode.REQUIRED_FIELD, "Motivo do override é obrigatório.");
+                }
+
+                creditDecisionOverrideRepository.save(CreditDecisionOverride.builder()
+                        .loanId(loan.getId())
+                        .creditCheckId(creditCheckSummary.getId())
+                        .overrideByUserId(command.getAnalystUserId())
+                        .overrideReason(reason)
+                        .createdAt(now)
+                        .build());
+            }
+
+            updatedLoan = approveLoanWithRepaymentPlan(loan, now);
+        } else {
+            updatedLoan = loan.reject(now);
+        }
+
         loanRepository.save(updatedLoan);
 
         // Retornar response
-        return mapper.toResponse(savedAnalysis);
+        CreditAnalysisResponse response = mapper.toResponse(savedAnalysis);
+        return enrichWithCreditCheckSummary(response);
+    }
+
+    private CreditAnalysisResponse enrichWithCreditCheckSummary(CreditAnalysisResponse response) {
+        if (response == null || response.getLoanId() == null) {
+            return response;
+        }
+
+        return CreditAnalysisResponse.builder()
+                .id(response.getId())
+                .loanId(response.getLoanId())
+                .customerId(response.getCustomerId())
+                .status(response.getStatus())
+                .analystUserId(response.getAnalystUserId())
+                .startedAt(response.getStartedAt())
+                .finishedAt(response.getFinishedAt())
+                .decisionDeadlineAt(response.getDecisionDeadlineAt())
+                .rejectionReason(response.getRejectionReason())
+                .notes(response.getNotes())
+                .creditCheckSummary(getLatestCreditCheckByLoanUseCase.getByLoanId(response.getLoanId()).orElse(null))
+                .build();
     }
 
     private Loan approveLoanWithRepaymentPlan(Loan loan, Instant now) {
-        if (loan.getPeriodoPagamento() == null) {
-            throw new ValidationException(ErrorCode.BUSINESS_RULE_VIOLATION, "Período de pagamento do empréstimo não informado.");
+        if (loan.getLoanTypeId() == null) {
+            throw new ValidationException(ErrorCode.BUSINESS_RULE_VIOLATION, "Tipo de empréstimo (loanTypeId) não informado.");
         }
 
-        if (loan.getPeriodoPagamento() != LoanPaymentPeriod.DAILY) {
-            throw new ValidationException(ErrorCode.BUSINESS_RULE_VIOLATION, "Somente empréstimos DAILY estão suportados no momento.");
-        }
+        LoanType loanType = loanTypeRepository.findById(loan.getLoanTypeId())
+                .orElseThrow(() -> new ValidationException(ErrorCode.BUSINESS_RULE_VIOLATION, "Tipo de empréstimo não encontrado."));
 
         if (loan.getDataPrevistaDevolucao() == null) {
             throw new ValidationException(ErrorCode.BUSINESS_RULE_VIOLATION, "Data prevista de devolução do empréstimo não informada.");
@@ -140,20 +225,18 @@ public class DecideCreditAnalysisUseCaseImpl implements DecideCreditAnalysisUseC
 
         LocalDate startDate = LocalDate.ofInstant(now, ZoneOffset.UTC).plusDays(1);
         LocalDate dueDate = LocalDate.ofInstant(loan.getDataPrevistaDevolucao(), ZoneOffset.UTC);
-        long daysInclusive = ChronoUnit.DAYS.between(startDate, dueDate) + 1;
 
-        if (daysInclusive < 1 || daysInclusive > 25) {
-            throw new ValidationException(
-                    ErrorCode.BUSINESS_RULE_VIOLATION,
-                    "Empréstimo DAILY deve ter entre 1 e 25 dias (de dataLiberacao + 1 até dataPrevistaDevolucao, inclusive)."
-            );
+        int installments = scheduleService.calculateInstallments(loanType, startDate, dueDate);
+        if (installments < 1) {
+            throw new ValidationException(ErrorCode.BUSINESS_RULE_VIOLATION, "Quantidade de parcelas inválida.");
         }
 
         BigDecimal valorParcela = loan.getValorDevolucaoPrevista()
-                .divide(BigDecimal.valueOf(daysInclusive), 2, RoundingMode.HALF_UP);
+                .divide(BigDecimal.valueOf(installments), 2, RoundingMode.HALF_UP);
 
-        Loan loanWithPlan = loan.applyRepaymentPlan(LoanPaymentPeriod.DAILY, (int) daysInclusive, valorParcela);
+        Loan loanWithPlan = loan.applyRepaymentPlan(scheduleService.resolvePaymentPeriod(loanType), installments, valorParcela);
         return loanWithPlan.approve(now);
     }
+
 }
 

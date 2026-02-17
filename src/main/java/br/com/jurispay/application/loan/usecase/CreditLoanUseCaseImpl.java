@@ -6,9 +6,11 @@ import br.com.jurispay.domain.exception.common.ErrorCode;
 import br.com.jurispay.domain.exception.common.NotFoundException;
 import br.com.jurispay.domain.exception.common.ValidationException;
 import br.com.jurispay.domain.loan.model.Loan;
-import br.com.jurispay.domain.loan.model.LoanPaymentPeriod;
 import br.com.jurispay.domain.loan.model.LoanStatus;
 import br.com.jurispay.domain.loan.repository.LoanRepository;
+import br.com.jurispay.domain.loan.service.InstallmentScheduleService;
+import br.com.jurispay.domain.loantype.model.LoanType;
+import br.com.jurispay.domain.loantype.repository.LoanTypeRepository;
 import br.com.jurispay.domain.receivable.model.Receivable;
 import br.com.jurispay.domain.receivable.model.ReceivableStatus;
 import br.com.jurispay.domain.receivable.repository.ReceivableRepository;
@@ -26,14 +28,20 @@ public class CreditLoanUseCaseImpl implements CreditLoanUseCase {
     private final LoanRepository loanRepository;
     private final ReceivableRepository receivableRepository;
     private final LoanResponseAssembler responseAssembler;
+    private final LoanTypeRepository loanTypeRepository;
+    private final InstallmentScheduleService scheduleService;
 
     public CreditLoanUseCaseImpl(
             LoanRepository loanRepository,
             ReceivableRepository receivableRepository,
-            LoanResponseAssembler responseAssembler) {
+            LoanResponseAssembler responseAssembler,
+            LoanTypeRepository loanTypeRepository,
+            InstallmentScheduleService scheduleService) {
         this.loanRepository = loanRepository;
         this.receivableRepository = receivableRepository;
         this.responseAssembler = responseAssembler;
+        this.loanTypeRepository = loanTypeRepository;
+        this.scheduleService = scheduleService;
     }
 
     @Override
@@ -53,28 +61,35 @@ public class CreditLoanUseCaseImpl implements CreditLoanUseCase {
             throw new ValidationException(ErrorCode.BUSINESS_RULE_VIOLATION, "Plano de pagamento do empréstimo está incompleto.");
         }
 
-        if (loan.getPeriodoPagamento() != LoanPaymentPeriod.DAILY) {
-            throw new ValidationException(ErrorCode.BUSINESS_RULE_VIOLATION, "Somente empréstimos DAILY estão suportados no momento.");
+        if (loan.getLoanTypeId() == null) {
+            throw new ValidationException(ErrorCode.BUSINESS_RULE_VIOLATION, "Tipo de empréstimo (loanTypeId) não informado.");
         }
+        LoanType loanType = loanTypeRepository.findById(loan.getLoanTypeId())
+                .orElseThrow(() -> new ValidationException(ErrorCode.BUSINESS_RULE_VIOLATION, "Tipo de empréstimo não encontrado."));
 
         Instant now = Instant.now();
         Loan creditedLoan = loan.credit(now);
         Loan savedLoan = loanRepository.save(creditedLoan);
 
-        List<Receivable> receivables = generateDailyReceivables(savedLoan, now);
-        receivableRepository.saveAll(receivables);
+        List<Receivable> existing = receivableRepository.findByLoanId(savedLoan.getId());
+        if (existing == null || existing.isEmpty()) {
+            List<Receivable> receivables = generateReceivables(savedLoan, loanType);
+            receivableRepository.saveAll(receivables);
+        }
 
         return responseAssembler.toResponse(savedLoan);
     }
 
-    private List<Receivable> generateDailyReceivables(Loan loan, Instant now) {
+    private List<Receivable> generateReceivables(Loan loan, LoanType loanType) {
         int installments = loan.getQuantidadeParcelas();
+        Instant now = Instant.now();
 
-        LocalDate start = LocalDate.ofInstant(now, ZoneOffset.UTC).plusDays(1);
+        LocalDate start = scheduleService.resolveStartDateFromCreditDate(loan.getDataLiberacao());
 
         List<Receivable> receivables = new ArrayList<>(installments);
         for (int i = 1; i <= installments; i++) {
-            Instant dueDate = start.plusDays(i - 1).atStartOfDay(ZoneOffset.UTC).toInstant();
+            LocalDate dueLocalDate = scheduleService.dueDateForInstallment(loanType, start, i);
+            Instant dueDate = dueLocalDate.atStartOfDay(ZoneOffset.UTC).toInstant();
             receivables.add(Receivable.builder()
                     .loanId(loan.getId())
                     .installmentNumber(i)

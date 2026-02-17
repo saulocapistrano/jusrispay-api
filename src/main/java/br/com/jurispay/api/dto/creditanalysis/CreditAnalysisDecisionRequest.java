@@ -25,5 +25,9 @@ public class CreditAnalysisDecisionRequest {
     private String rejectionReason;
 
     private String notes;
+
+    private Boolean overrideCreditCheck;
+
+    private String overrideReason;
 }
 

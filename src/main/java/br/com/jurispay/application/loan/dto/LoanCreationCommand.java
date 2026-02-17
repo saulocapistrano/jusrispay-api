@@ -27,5 +27,7 @@ public class LoanCreationCommand {
     private BigDecimal taxaJuros;
     private LoanPaymentPeriod periodoPagamento;
     private Instant dataPrevistaDevolucao;
+
+    private Boolean allowKycIncomplete;
 }
 
