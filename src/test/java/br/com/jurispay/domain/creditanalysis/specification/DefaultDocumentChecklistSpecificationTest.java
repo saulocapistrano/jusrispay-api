@@ -23,15 +23,10 @@ class DefaultDocumentChecklistSpecificationTest {
 
     @Test
     void shouldReturnTrueWhenAllRequiredDocumentsArePresent() {
-        // Given - todos os 8 documentos obrigatórios
+        // Given - todos os documentos obrigatórios
         Set<DocumentType> availableDocuments = EnumSet.of(
                 DocumentType.ADDRESS_PROOF,
-                DocumentType.WHATSAPP_LOCATION,
-                DocumentType.OCCUPATION_DESCRIPTION,
                 DocumentType.SELFIE_WITH_ID,
-                DocumentType.WORK_ADDRESS,
-                DocumentType.SOCIAL_MEDIA,
-                DocumentType.REFERENCE_CONTACTS,
                 DocumentType.INCOME_PROOF
         );
 
@@ -47,12 +42,7 @@ class DefaultDocumentChecklistSpecificationTest {
         // Given - todos os obrigatórios + CONTRACT_PDF (que não é obrigatório)
         Set<DocumentType> availableDocuments = EnumSet.of(
                 DocumentType.ADDRESS_PROOF,
-                DocumentType.WHATSAPP_LOCATION,
-                DocumentType.OCCUPATION_DESCRIPTION,
                 DocumentType.SELFIE_WITH_ID,
-                DocumentType.WORK_ADDRESS,
-                DocumentType.SOCIAL_MEDIA,
-                DocumentType.REFERENCE_CONTACTS,
                 DocumentType.INCOME_PROOF,
                 DocumentType.CONTRACT_PDF
         );
@@ -68,12 +58,7 @@ class DefaultDocumentChecklistSpecificationTest {
     void shouldReturnFalseWhenOneRequiredDocumentIsMissing() {
         // Given - faltando ADDRESS_PROOF
         Set<DocumentType> availableDocuments = EnumSet.of(
-                DocumentType.WHATSAPP_LOCATION,
-                DocumentType.OCCUPATION_DESCRIPTION,
                 DocumentType.SELFIE_WITH_ID,
-                DocumentType.WORK_ADDRESS,
-                DocumentType.SOCIAL_MEDIA,
-                DocumentType.REFERENCE_CONTACTS,
                 DocumentType.INCOME_PROOF
         );
 
@@ -112,14 +97,9 @@ class DefaultDocumentChecklistSpecificationTest {
 
         // Then
         assertNotNull(requiredTypes);
-        assertEquals(8, requiredTypes.size());
+        assertEquals(3, requiredTypes.size());
         assertTrue(requiredTypes.contains(DocumentType.ADDRESS_PROOF));
-        assertTrue(requiredTypes.contains(DocumentType.WHATSAPP_LOCATION));
-        assertTrue(requiredTypes.contains(DocumentType.OCCUPATION_DESCRIPTION));
         assertTrue(requiredTypes.contains(DocumentType.SELFIE_WITH_ID));
-        assertTrue(requiredTypes.contains(DocumentType.WORK_ADDRESS));
-        assertTrue(requiredTypes.contains(DocumentType.SOCIAL_MEDIA));
-        assertTrue(requiredTypes.contains(DocumentType.REFERENCE_CONTACTS));
         assertTrue(requiredTypes.contains(DocumentType.INCOME_PROOF));
         assertFalse(requiredTypes.contains(DocumentType.CONTRACT_PDF));
     }
