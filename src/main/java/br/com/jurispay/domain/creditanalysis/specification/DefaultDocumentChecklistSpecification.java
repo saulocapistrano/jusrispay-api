@@ -11,15 +11,10 @@ import java.util.Set;
  */
 public class DefaultDocumentChecklistSpecification implements DocumentChecklistSpecification {
 
-    // Documentos obrigatórios para aprovação (8 itens, excluindo CONTRACT_PDF)
+    // Documentos obrigatórios para aprovação
     private static final Set<DocumentType> REQUIRED_DOCUMENT_TYPES = EnumSet.of(
             DocumentType.ADDRESS_PROOF,
-            DocumentType.WHATSAPP_LOCATION,
-            DocumentType.OCCUPATION_DESCRIPTION,
             DocumentType.SELFIE_WITH_ID,
-            DocumentType.WORK_ADDRESS,
-            DocumentType.SOCIAL_MEDIA,
-            DocumentType.REFERENCE_CONTACTS,
             DocumentType.INCOME_PROOF
     );
 

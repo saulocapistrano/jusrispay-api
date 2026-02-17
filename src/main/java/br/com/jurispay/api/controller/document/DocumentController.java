@@ -16,13 +16,13 @@ import br.com.jurispay.infrastructure.filestorage.minio.MinioS3FileStorageReposi
 import jakarta.validation.Valid;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -57,32 +57,28 @@ public class DocumentController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DocumentResponse> upload(
-            @RequestPart("customerId") Long customerId,
-            @RequestPart(value = "loanId", required = false) Long loanId,
-            @RequestPart("type") DocumentType type,
-            @RequestPart("file") MultipartFile file) {
-        try {
-            DocumentUploadCommand command = DocumentUploadCommand.builder()
-                    .customerId(customerId)
-                    .loanId(loanId)
-                    .type(type)
-                    .originalFileName(file.getOriginalFilename())
-                    .contentType(file.getContentType())
-                    .bytes(file.getBytes())
-                    .build();
+            @RequestParam("customerId") Long customerId,
+            @RequestParam(value = "loanId", required = false) Long loanId,
+            @RequestParam("type") DocumentType type,
+            @RequestParam("file") MultipartFile file) throws IOException {
+        DocumentUploadCommand command = DocumentUploadCommand.builder()
+                .customerId(customerId)
+                .loanId(loanId)
+                .type(type)
+                .originalFileName(file.getOriginalFilename())
+                .contentType(file.getContentType())
+                .bytes(file.getBytes())
+                .build();
 
-            DocumentResponse response = uploadDocumentUseCase.upload(command);
+        DocumentResponse response = uploadDocumentUseCase.upload(command);
 
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(response.getId())
-                    .toUri();
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.getId())
+                .toUri();
 
-            return ResponseEntity.created(location).body(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return ResponseEntity.created(location).body(response);
     }
 
     @GetMapping("/{id}")
