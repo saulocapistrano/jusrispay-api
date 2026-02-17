@@ -14,6 +14,7 @@ import br.com.jurispay.domain.loan.model.Loan;
 import br.com.jurispay.domain.loan.model.LoanStatus;
 import br.com.jurispay.domain.loan.policy.LoanPolicy;
 import br.com.jurispay.domain.loan.repository.LoanRepository;
+import br.com.jurispay.domain.loantype.repository.LoanTypeRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -31,6 +32,7 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
     private final LoanFactory loanFactory;
     private final LoanPolicy loanPolicy;
     private final CustomerKycService customerKycService;
+    private final LoanTypeRepository loanTypeRepository;
 
     public CreateLoanUseCaseImpl(
             LoanRepository loanRepository,
@@ -39,7 +41,8 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
             LoanCreationCommandValidator validator,
             LoanFactory loanFactory,
             LoanPolicy loanPolicy,
-            CustomerKycService customerKycService) {
+            CustomerKycService customerKycService,
+            LoanTypeRepository loanTypeRepository) {
         this.loanRepository = loanRepository;
         this.customerRepository = customerRepository;
         this.responseAssembler = responseAssembler;
@@ -47,6 +50,7 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
         this.loanFactory = loanFactory;
         this.loanPolicy = loanPolicy;
         this.customerKycService = customerKycService;
+        this.loanTypeRepository = loanTypeRepository;
     }
 
     @Override
@@ -57,6 +61,12 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
         // Verificar se cliente existe
         customerRepository.findById(command.getCustomerId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.CUSTOMER_NOT_FOUND, "Cliente não encontrado para criação de empréstimo."));
+
+        loanTypeRepository.findById(command.getLoanTypeId())
+                .filter(t -> Boolean.TRUE.equals(t.getAtivo()))
+                .orElseThrow(() -> new br.com.jurispay.domain.exception.common.ValidationException(
+                        ErrorCode.BUSINESS_RULE_VIOLATION,
+                        "Tipo de empréstimo não encontrado ou inativo."));
 
         // Bloqueio por KYC renovável
         boolean allowKycIncomplete = Boolean.TRUE.equals(command.getAllowKycIncomplete());
@@ -71,6 +81,7 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
         // Montar dados de criação
         LoanCreationData creationData = LoanCreationData.builder()
                 .customerId(command.getCustomerId())
+                .loanTypeId(command.getLoanTypeId())
                 .valorSolicitado(command.getValorSolicitado())
                 .taxaJuros(command.getTaxaJuros())
                 .periodoPagamento(command.getPeriodoPagamento())

@@ -37,6 +37,7 @@ public class LoanFactory {
 
         return Loan.builder()
                 .customerId(data.getCustomerId())
+                .loanTypeId(data.getLoanTypeId())
                 .valorSolicitado(data.getValorSolicitado())
                 .valorDevolucaoPrevista(valorDevolucaoPrevista)
                 .taxaJuros(taxaJuros)

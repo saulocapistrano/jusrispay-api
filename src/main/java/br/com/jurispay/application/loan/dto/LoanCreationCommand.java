@@ -23,6 +23,7 @@ import java.time.Instant;
 public class LoanCreationCommand {
 
     private Long customerId;
+    private Long loanTypeId;
     private BigDecimal valorSolicitado;
     private BigDecimal taxaJuros;
     private LoanPaymentPeriod periodoPagamento;

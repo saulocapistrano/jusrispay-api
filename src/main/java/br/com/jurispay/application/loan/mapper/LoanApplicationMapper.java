@@ -13,7 +13,6 @@ import org.mapstruct.Mapping;
 public interface LoanApplicationMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "loanTypeId", ignore = true)
     @Mapping(target = "dataCriacao", ignore = true)
     @Mapping(target = "dataAtualizacao", ignore = true)
     @Mapping(target = "dataLiberacao", ignore = true)

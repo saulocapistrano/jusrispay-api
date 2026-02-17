@@ -22,6 +22,11 @@ public class LoanCreationData {
     private final Long customerId;
 
     /**
+     * ID do tipo de empréstimo (loanType).
+     */
+    private final Long loanTypeId;
+
+    /**
      * Valor solicitado pelo cliente.
      */
     private final BigDecimal valorSolicitado;
