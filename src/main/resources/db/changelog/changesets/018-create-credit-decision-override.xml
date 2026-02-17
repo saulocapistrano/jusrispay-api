@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="018-create-credit-decision-override" author="jurispay">
+
+        <createTable tableName="credit_decision_override">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="loan_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="credit_check_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="override_by_user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="override_reason" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="credit_decision_override" indexName="idx_credit_decision_override_loan_id">
+            <column name="loan_id"/>
+        </createIndex>
+
+        <createIndex tableName="credit_decision_override" indexName="idx_credit_decision_override_credit_check_id">
+            <column name="credit_check_id"/>
+        </createIndex>
+
+    </changeSet>
+</databaseChangeLog>

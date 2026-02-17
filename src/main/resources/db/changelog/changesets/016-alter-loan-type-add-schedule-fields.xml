@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="016-alter-loan-type-add-schedule-fields" author="jurispay">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="loan_type"/>
+        </preConditions>
+
+        <addColumn tableName="loan_type">
+            <column name="schedule_type" type="VARCHAR(30)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="weekly_day_of_week" type="VARCHAR(10)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <createIndex tableName="loan_type" indexName="idx_loan_type_schedule_type">
+            <column name="schedule_type"/>
+        </createIndex>
+
+        <!-- Backfill: tipos baseados em intervalo de dias -->
+        <update tableName="loan_type">
+            <column name="schedule_type" value="INTERVAL_DAYS"/>
+            <where>schedule_type is null</where>
+        </update>
+
+        <!-- Para o tipo 'Semanal', deixar schedule_type como WEEKLY_FIXED_DAY e exigir definição do dia via aplicação -->
+        <update tableName="loan_type">
+            <column name="schedule_type" value="WEEKLY_FIXED_DAY"/>
+            <where>id = 2</where>
+        </update>
+
+        <update tableName="loan_type">
+            <column name="weekly_day_of_week" value="SUNDAY"/>
+            <where>id = 2 and weekly_day_of_week is null</where>
+        </update>
+
+        <update tableName="loan_type">
+            <column name="schedule_type" value="WEEKLY_FIXED_DAY"/>
+            <where>id = 7</where>
+        </update>
+
+        <update tableName="loan_type">
+            <column name="weekly_day_of_week" value="SATURDAY"/>
+            <where>id = 7 and weekly_day_of_week is null</where>
+        </update>
+
+        <addNotNullConstraint tableName="loan_type" columnName="schedule_type" columnDataType="VARCHAR(30)"/>
+    </changeSet>
+
+</databaseChangeLog>

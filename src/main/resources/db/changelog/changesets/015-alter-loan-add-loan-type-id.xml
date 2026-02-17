@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="015-alter-loan-add-loan-type-id" author="jurispay">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="loan"/>
+            <tableExists tableName="loan_type"/>
+        </preConditions>
+
+        <addColumn tableName="loan">
+            <column name="loan_type_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <createIndex tableName="loan" indexName="idx_loan_loan_type_id">
+            <column name="loan_type_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="loan"
+            baseColumnNames="loan_type_id"
+            referencedTableName="loan_type"
+            referencedColumnNames="id"
+            constraintName="fk_loan_loan_type"/>
+
+        <update tableName="loan">
+            <column name="loan_type_id" valueNumeric="1"/>
+            <where>loan_type_id is null</where>
+        </update>
+
+        <addNotNullConstraint tableName="loan" columnName="loan_type_id" columnDataType="BIGINT"/>
+    </changeSet>
+
+</databaseChangeLog>
