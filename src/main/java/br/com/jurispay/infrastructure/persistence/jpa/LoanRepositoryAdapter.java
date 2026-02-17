@@ -4,8 +4,10 @@ import br.com.jurispay.domain.loan.model.Loan;
 import br.com.jurispay.domain.loan.repository.LoanRepository;
 import br.com.jurispay.infrastructure.persistence.jpa.entity.CustomerEntity;
 import br.com.jurispay.infrastructure.persistence.jpa.entity.LoanEntity;
+import br.com.jurispay.infrastructure.persistence.jpa.entity.LoanTypeEntity;
 import br.com.jurispay.infrastructure.persistence.jpa.repository.SpringDataCustomerRepository;
 import br.com.jurispay.infrastructure.persistence.jpa.repository.SpringDataLoanRepository;
+import br.com.jurispay.infrastructure.persistence.jpa.repository.SpringDataLoanTypeRepository;
 import br.com.jurispay.infrastructure.persistence.mapper.LoanEntityMapper;
 import org.springframework.stereotype.Component;
 
@@ -22,14 +24,17 @@ public class LoanRepositoryAdapter implements LoanRepository {
 
     private final SpringDataLoanRepository springDataLoanRepository;
     private final SpringDataCustomerRepository springDataCustomerRepository;
+    private final SpringDataLoanTypeRepository springDataLoanTypeRepository;
     private final LoanEntityMapper mapper;
 
     public LoanRepositoryAdapter(
             SpringDataLoanRepository springDataLoanRepository,
             SpringDataCustomerRepository springDataCustomerRepository,
+            SpringDataLoanTypeRepository springDataLoanTypeRepository,
             LoanEntityMapper mapper) {
         this.springDataLoanRepository = springDataLoanRepository;
         this.springDataCustomerRepository = springDataCustomerRepository;
+        this.springDataLoanTypeRepository = springDataLoanTypeRepository;
         this.mapper = mapper;
     }
 
@@ -39,8 +44,15 @@ public class LoanRepositoryAdapter implements LoanRepository {
         CustomerEntity customerEntity = springDataCustomerRepository.findById(loan.getCustomerId())
                 .orElseThrow(() -> new IllegalStateException("Cliente não encontrado para persistência do empréstimo."));
 
+        if (loan.getLoanTypeId() == null) {
+            throw new IllegalStateException("loanTypeId é obrigatório para persistência do empréstimo.");
+        }
+        LoanTypeEntity loanTypeEntity = springDataLoanTypeRepository.findById(loan.getLoanTypeId())
+                .orElseThrow(() -> new IllegalStateException("Tipo de empréstimo não encontrado para persistência do empréstimo."));
+
         // Converter Loan -> LoanEntity
         LoanEntity entity = mapper.toEntity(loan, customerEntity);
+        entity.setLoanType(loanTypeEntity);
 
         // Salvar
         LoanEntity savedEntity = springDataLoanRepository.save(entity);

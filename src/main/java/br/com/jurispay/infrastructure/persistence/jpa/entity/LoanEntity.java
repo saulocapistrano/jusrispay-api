@@ -33,6 +33,10 @@ public class LoanEntity {
     @JoinColumn(name = "customer_id", nullable = false)
     private CustomerEntity customer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "loan_type_id", nullable = false)
+    private LoanTypeEntity loanType;
+
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal valorSolicitado;
 

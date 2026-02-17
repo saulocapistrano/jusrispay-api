@@ -8,5 +8,6 @@ public enum LoanPaymentPeriod {
     WEEKLY,
     TEN_DAYS,
     FIFTEEN_DAYS,
+    TWENTY_DAYS,
     MONTHLY
 }

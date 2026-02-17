@@ -3,6 +3,7 @@ package br.com.jurispay.infrastructure.persistence.mapper;
 import br.com.jurispay.domain.loan.model.Loan;
 import br.com.jurispay.infrastructure.persistence.jpa.entity.CustomerEntity;
 import br.com.jurispay.infrastructure.persistence.jpa.entity.LoanEntity;
+import br.com.jurispay.infrastructure.persistence.jpa.entity.LoanTypeEntity;
 import org.mapstruct.Mapper;
 
 /**
@@ -19,6 +20,7 @@ public interface LoanEntityMapper {
         return Loan.builder()
                 .id(entity.getId())
                 .customerId(entity.getCustomer().getId())
+                .loanTypeId(entity.getLoanType() != null ? entity.getLoanType().getId() : null)
                 .valorSolicitado(entity.getValorSolicitado())
                 .valorDevolucaoPrevista(entity.getValorDevolucaoPrevista())
                 .taxaJuros(entity.getTaxaJuros())
@@ -42,6 +44,7 @@ public interface LoanEntityMapper {
         return LoanEntity.builder()
                 .id(loan.getId())
                 .customer(customerEntity)
+                .loanType(loan.getLoanTypeId() != null ? LoanTypeEntity.builder().id(loan.getLoanTypeId()).build() : null)
                 .valorSolicitado(loan.getValorSolicitado())
                 .valorDevolucaoPrevista(loan.getValorDevolucaoPrevista())
                 .taxaJuros(loan.getTaxaJuros())

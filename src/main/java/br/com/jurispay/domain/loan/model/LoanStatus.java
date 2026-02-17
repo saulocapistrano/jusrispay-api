@@ -9,6 +9,11 @@ public enum LoanStatus {
      */
     REQUESTED,
 
+    /**
+     * Solicitação criada, porém pendente de documentos/validação de KYC.
+     */
+    PENDING_DOCUMENTS,
+
     APPROVED,
 
     CREDITED,

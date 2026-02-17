@@ -10,6 +10,7 @@ import br.com.jurispay.infrastructure.persistence.mapper.ReceivableEntityMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -26,6 +27,33 @@ public class ReceivableRepositoryAdapter implements ReceivableRepository {
         this.springDataReceivableRepository = springDataReceivableRepository;
         this.springDataLoanRepository = springDataLoanRepository;
         this.mapper = mapper;
+    }
+
+    @Override
+    public Receivable save(Receivable receivable) {
+        if (receivable == null) {
+            throw new IllegalArgumentException("Receivable é obrigatório.");
+        }
+
+        Long loanId = receivable.getLoanId();
+        if (loanId == null) {
+            throw new IllegalArgumentException("loanId é obrigatório para persistência de recebível.");
+        }
+
+        LoanEntity loanEntity = springDataLoanRepository.findById(loanId)
+                .orElseThrow(() -> new IllegalStateException("Empréstimo não encontrado para persistência de recebível."));
+
+        ReceivableEntity entity = mapper.toEntity(receivable, loanEntity);
+        ReceivableEntity saved = springDataReceivableRepository.save(entity);
+        return mapper.toDomain(saved);
+    }
+
+    @Override
+    public Optional<Receivable> findById(Long id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+        return springDataReceivableRepository.findById(id).map(mapper::toDomain);
     }
 
     @Override

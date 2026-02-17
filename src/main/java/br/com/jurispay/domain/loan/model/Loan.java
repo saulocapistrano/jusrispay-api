@@ -21,6 +21,7 @@ public class Loan {
 
     private Long id;
     private Long customerId;
+    private Long loanTypeId;
     private BigDecimal valorSolicitado;
     private BigDecimal valorDevolucaoPrevista;
     private BigDecimal taxaJuros;
@@ -38,6 +39,7 @@ public class Loan {
         return Loan.builder()
                 .id(this.id)
                 .customerId(this.customerId)
+                .loanTypeId(this.loanTypeId)
                 .valorSolicitado(this.valorSolicitado)
                 .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
                 .taxaJuros(this.taxaJuros)
@@ -57,6 +59,7 @@ public class Loan {
         return Loan.builder()
                 .id(this.id)
                 .customerId(this.customerId)
+                .loanTypeId(this.loanTypeId)
                 .valorSolicitado(this.valorSolicitado)
                 .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
                 .taxaJuros(this.taxaJuros)
@@ -76,6 +79,7 @@ public class Loan {
         return Loan.builder()
                 .id(this.id)
                 .customerId(this.customerId)
+                .loanTypeId(this.loanTypeId)
                 .valorSolicitado(this.valorSolicitado)
                 .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
                 .taxaJuros(this.taxaJuros)
@@ -101,6 +105,7 @@ public class Loan {
         return Loan.builder()
                 .id(this.id)
                 .customerId(this.customerId)
+                .loanTypeId(this.loanTypeId)
                 .valorSolicitado(this.valorSolicitado)
                 .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
                 .taxaJuros(this.taxaJuros)
@@ -126,6 +131,7 @@ public class Loan {
         return Loan.builder()
                 .id(this.id)
                 .customerId(this.customerId)
+                .loanTypeId(this.loanTypeId)
                 .valorSolicitado(this.valorSolicitado)
                 .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
                 .taxaJuros(this.taxaJuros)
@@ -145,6 +151,7 @@ public class Loan {
         return Loan.builder()
                 .id(this.id)
                 .customerId(this.customerId)
+                .loanTypeId(this.loanTypeId)
                 .valorSolicitado(this.valorSolicitado)
                 .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
                 .taxaJuros(this.taxaJuros)
