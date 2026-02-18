@@ -37,6 +37,9 @@ public class ReceivableController {
         ReceivableResponse response = payReceivableUseCase.pay(PayReceivableCommand.builder()
                 .receivableId(receivableId)
                 .adimplente(request.getAdimplente())
+                .paymentType(request.getPaymentType())
+                .fineId(request.getFineId())
+                .fineTimes(request.getFineTimes())
                 .build());
         return ResponseEntity.ok(response);
     }
