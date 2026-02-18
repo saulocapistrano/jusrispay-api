@@ -7,6 +7,7 @@ import br.com.jurispay.application.loan.usecase.CreateLoanUseCase;
 import br.com.jurispay.application.loan.usecase.CreditLoanUseCase;
 import br.com.jurispay.application.loan.usecase.GetLoanByIdUseCase;
 import br.com.jurispay.application.loan.usecase.ListLoansUseCase;
+import br.com.jurispay.application.loan.usecase.SyncLoanStatusFromCreditAnalysisUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class LoanController {
     private final GetLoanByIdUseCase getLoanByIdUseCase;
     private final ListLoansUseCase listLoansUseCase;
     private final CreditLoanUseCase creditLoanUseCase;
+    private final SyncLoanStatusFromCreditAnalysisUseCase syncLoanStatusFromCreditAnalysisUseCase;
     private final LoanRequestToCommandMapper requestMapper;
 
     public LoanController(
@@ -34,11 +36,13 @@ public class LoanController {
             GetLoanByIdUseCase getLoanByIdUseCase,
             ListLoansUseCase listLoansUseCase,
             CreditLoanUseCase creditLoanUseCase,
+            SyncLoanStatusFromCreditAnalysisUseCase syncLoanStatusFromCreditAnalysisUseCase,
             LoanRequestToCommandMapper requestMapper) {
         this.createLoanUseCase = createLoanUseCase;
         this.getLoanByIdUseCase = getLoanByIdUseCase;
         this.listLoansUseCase = listLoansUseCase;
         this.creditLoanUseCase = creditLoanUseCase;
+        this.syncLoanStatusFromCreditAnalysisUseCase = syncLoanStatusFromCreditAnalysisUseCase;
         this.requestMapper = requestMapper;
     }
 
@@ -72,6 +76,12 @@ public class LoanController {
     @PostMapping("/{id}/credit")
     public ResponseEntity<LoanResponse> credit(@PathVariable Long id) {
         LoanResponse response = creditLoanUseCase.credit(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/sync-status-from-analysis")
+    public ResponseEntity<LoanResponse> syncStatusFromAnalysis(@PathVariable Long id) {
+        LoanResponse response = syncLoanStatusFromCreditAnalysisUseCase.sync(id);
         return ResponseEntity.ok(response);
     }
 }
