@@ -95,6 +95,26 @@ public class Loan {
                 .build();
     }
 
+    public Loan markAsRequested(Instant now) {
+        return Loan.builder()
+                .id(this.id)
+                .customerId(this.customerId)
+                .loanTypeId(this.loanTypeId)
+                .valorSolicitado(this.valorSolicitado)
+                .valorDevolucaoPrevista(this.valorDevolucaoPrevista)
+                .taxaJuros(this.taxaJuros)
+                .multaDiaria(this.multaDiaria)
+                .periodoPagamento(this.periodoPagamento)
+                .quantidadeParcelas(this.quantidadeParcelas)
+                .valorParcela(this.valorParcela)
+                .dataLiberacao(this.dataLiberacao)
+                .dataPrevistaDevolucao(this.dataPrevistaDevolucao)
+                .dataCriacao(this.dataCriacao)
+                .dataAtualizacao(now)
+                .status(LoanStatus.REQUESTED)
+                .build();
+    }
+
     /**
      * Marca o empréstimo como OVERDUE (em atraso).
      * Cria uma nova instância com status atualizado e dataAtualizacao atualizada.
