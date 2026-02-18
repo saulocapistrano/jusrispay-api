@@ -69,7 +69,10 @@ public class MinioS3FileStorageRepository implements FileStorageRepository {
                     .sizeBytes((long) command.getBytes().length)
                     .build();
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao fazer upload do arquivo: " + e.getMessage(), e);
+            throw new RuntimeException(
+                    "Erro ao fazer upload do arquivo (bucket=" + command.getBucket() + ", objectKey=" + command.getObjectKey() + "): " + e.getMessage(),
+                    e
+            );
         }
     }
 
