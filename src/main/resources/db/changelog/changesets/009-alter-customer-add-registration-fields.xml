@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="009-alter-customer-add-registration-fields" author="jurispay">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="customer"/>
+        </preConditions>
+
+        <addColumn tableName="customer">
+            <column name="idade" type="INT"/>
+            <column name="rg" type="VARCHAR(20)"/>
+            <column name="data_nasc" type="DATE"/>
+            <column name="sexo" type="VARCHAR(20)"/>
+            <column name="signo" type="VARCHAR(20)"/>
+            <column name="mae" type="VARCHAR(255)"/>
+            <column name="pai" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="senha_hash" type="VARCHAR(80)"/>
+            <column name="cep" type="VARCHAR(10)"/>
+            <column name="endereco" type="VARCHAR(255)"/>
+            <column name="numero" type="INT"/>
+            <column name="bairro" type="VARCHAR(120)"/>
+            <column name="cidade" type="VARCHAR(120)"/>
+            <column name="estado" type="VARCHAR(2)"/>
+            <column name="telefone_fixo" type="VARCHAR(20)"/>
+            <column name="celular" type="VARCHAR(20)"/>
+            <column name="bem_garantidor" type="BOOLEAN"/>
+            <column name="descricao_bem" type="VARCHAR(255)"/>
+        </addColumn>
+
+        <createIndex tableName="customer" indexName="idx_customer_email">
+            <column name="email"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

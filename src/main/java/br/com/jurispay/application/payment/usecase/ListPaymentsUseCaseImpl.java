@@ -2,7 +2,7 @@ package br.com.jurispay.application.payment.usecase;
 
 import br.com.jurispay.application.payment.dto.PaymentResponse;
 import br.com.jurispay.application.payment.mapper.PaymentApplicationMapper;
-import br.com.jurispay.domain.common.exception.ValidationException;
+import br.com.jurispay.domain.exception.common.ValidationException;
 import br.com.jurispay.domain.payment.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
 

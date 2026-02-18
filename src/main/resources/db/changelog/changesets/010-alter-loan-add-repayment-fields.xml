@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="010-alter-loan-add-repayment-fields" author="jurispay">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="loan"/>
+        </preConditions>
+
+        <addColumn tableName="loan">
+            <column name="periodo_pagamento" type="VARCHAR(20)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="quantidade_parcelas" type="INT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="valor_parcela" type="NUMERIC(19,2)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <createIndex tableName="loan" indexName="idx_loan_periodo_pagamento">
+            <column name="periodo_pagamento"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

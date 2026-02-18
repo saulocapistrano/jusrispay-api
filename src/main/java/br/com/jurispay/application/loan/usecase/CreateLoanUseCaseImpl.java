@@ -2,16 +2,24 @@ package br.com.jurispay.application.loan.usecase;
 
 import br.com.jurispay.application.loan.dto.LoanCreationCommand;
 import br.com.jurispay.application.loan.dto.LoanResponse;
-import br.com.jurispay.application.loan.mapper.LoanApplicationMapper;
-import br.com.jurispay.domain.common.exception.NotFoundException;
-import br.com.jurispay.domain.common.exception.ValidationException;
+import br.com.jurispay.application.loan.assembler.LoanResponseAssembler;
+import br.com.jurispay.application.loan.validator.LoanCreationCommandValidator;
+import br.com.jurispay.domain.exception.common.NotFoundException;
+import br.com.jurispay.application.customer.service.CustomerKycService;
+import br.com.jurispay.domain.exception.common.ErrorCode;
 import br.com.jurispay.domain.customer.repository.CustomerRepository;
+import br.com.jurispay.domain.loan.factory.LoanCreationData;
+import br.com.jurispay.domain.loan.factory.LoanFactory;
 import br.com.jurispay.domain.loan.model.Loan;
+import br.com.jurispay.domain.loan.model.LoanPaymentPeriod;
 import br.com.jurispay.domain.loan.model.LoanStatus;
+import br.com.jurispay.domain.loan.policy.LoanPolicy;
 import br.com.jurispay.domain.loan.repository.LoanRepository;
+import br.com.jurispay.domain.loan.service.InstallmentScheduleService;
+import br.com.jurispay.domain.loantype.model.LoanType;
+import br.com.jurispay.domain.loantype.repository.LoanTypeRepository;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 
 /**
@@ -20,68 +28,109 @@ import java.time.Instant;
 @Service
 public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
 
-    private static final BigDecimal TAXA_JUROS_PADRAO = new BigDecimal("0.30");
-    private static final BigDecimal MULTA_DIARIA_PADRAO = new BigDecimal("20.00");
-
     private final LoanRepository loanRepository;
     private final CustomerRepository customerRepository;
-    private final LoanApplicationMapper mapper;
+    private final LoanResponseAssembler responseAssembler;
+    private final LoanCreationCommandValidator validator;
+    private final LoanFactory loanFactory;
+    private final LoanPolicy loanPolicy;
+    private final CustomerKycService customerKycService;
+    private final LoanTypeRepository loanTypeRepository;
+    private final InstallmentScheduleService installmentScheduleService;
 
     public CreateLoanUseCaseImpl(
             LoanRepository loanRepository,
             CustomerRepository customerRepository,
-            LoanApplicationMapper mapper) {
+            LoanResponseAssembler responseAssembler,
+            LoanCreationCommandValidator validator,
+            LoanFactory loanFactory,
+            LoanPolicy loanPolicy,
+            CustomerKycService customerKycService,
+            LoanTypeRepository loanTypeRepository,
+            InstallmentScheduleService installmentScheduleService) {
         this.loanRepository = loanRepository;
         this.customerRepository = customerRepository;
-        this.mapper = mapper;
+        this.responseAssembler = responseAssembler;
+        this.validator = validator;
+        this.loanFactory = loanFactory;
+        this.loanPolicy = loanPolicy;
+        this.customerKycService = customerKycService;
+        this.loanTypeRepository = loanTypeRepository;
+        this.installmentScheduleService = installmentScheduleService;
     }
 
     @Override
     public LoanResponse create(LoanCreationCommand command) {
+        if (command != null && command.getPeriodoPagamento() == null && command.getLoanTypeId() != null) {
+            LoanType loanType = loanTypeRepository.findById(command.getLoanTypeId())
+                    .orElse(null);
+            if (loanType != null) {
+                LoanPaymentPeriod resolved = installmentScheduleService.resolvePaymentPeriod(loanType);
+                command.setPeriodoPagamento(resolved);
+            }
+        }
+
         // Validações de negócio
-        validateCommand(command);
+        validator.validate(command);
 
         // Verificar se cliente existe
         customerRepository.findById(command.getCustomerId())
-                .orElseThrow(() -> new NotFoundException("Cliente não encontrado para criação de empréstimo."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.CUSTOMER_NOT_FOUND, "Cliente não encontrado para criação de empréstimo."));
 
-        // Criar Loan base a partir do comando
-        Loan loan = mapper.toDomain(command);
+        loanTypeRepository.findById(command.getLoanTypeId())
+                .filter(t -> Boolean.TRUE.equals(t.getAtivo()))
+                .orElseThrow(() -> new br.com.jurispay.domain.exception.common.ValidationException(
+                        ErrorCode.BUSINESS_RULE_VIOLATION,
+                        "Tipo de empréstimo não encontrado ou inativo."));
 
-        // Definir valores padrão e calculados
-        Instant now = Instant.now();
-        BigDecimal valorDevolucaoPrevista = command.getValorSolicitado()
-                .multiply(BigDecimal.ONE.add(TAXA_JUROS_PADRAO));
+        // Bloqueio por KYC renovável
+        boolean allowKycIncomplete = Boolean.TRUE.equals(command.getAllowKycIncomplete());
+        try {
+            customerKycService.validateCustomerEligibleForLoan(command.getCustomerId(), Instant.now());
+        } catch (br.com.jurispay.domain.exception.common.ValidationException ex) {
+            if (!allowKycIncomplete) {
+                throw ex;
+            }
+        }
 
-        // Construir Loan completo usando builder
-        Loan loanCompleto = Loan.builder()
-                .customerId(loan.getCustomerId())
-                .valorSolicitado(loan.getValorSolicitado())
-                .dataPrevistaDevolucao(loan.getDataPrevistaDevolucao())
-                .taxaJuros(TAXA_JUROS_PADRAO)
-                .multaDiaria(MULTA_DIARIA_PADRAO)
-                .valorDevolucaoPrevista(valorDevolucaoPrevista)
-                .dataLiberacao(now)
-                .dataCriacao(now)
-                .dataAtualizacao(now)
-                .status(LoanStatus.OPEN)
+        // Montar dados de criação
+        LoanCreationData creationData = LoanCreationData.builder()
+                .customerId(command.getCustomerId())
+                .loanTypeId(command.getLoanTypeId())
+                .valorSolicitado(command.getValorSolicitado())
+                .taxaJuros(command.getTaxaJuros())
+                .periodoPagamento(command.getPeriodoPagamento())
+                .dataPrevistaDevolucao(command.getDataPrevistaDevolucao())
                 .build();
 
+        // Criar Loan usando factory
+        Instant now = Instant.now();
+        Loan loan = loanFactory.create(creationData, loanPolicy, now);
+
+        if (allowKycIncomplete) {
+            loan = Loan.builder()
+                    .id(loan.getId())
+                    .customerId(loan.getCustomerId())
+                    .valorSolicitado(loan.getValorSolicitado())
+                    .valorDevolucaoPrevista(loan.getValorDevolucaoPrevista())
+                    .taxaJuros(loan.getTaxaJuros())
+                    .multaDiaria(loan.getMultaDiaria())
+                    .periodoPagamento(loan.getPeriodoPagamento())
+                    .quantidadeParcelas(loan.getQuantidadeParcelas())
+                    .valorParcela(loan.getValorParcela())
+                    .dataLiberacao(loan.getDataLiberacao())
+                    .dataPrevistaDevolucao(loan.getDataPrevistaDevolucao())
+                    .dataCriacao(loan.getDataCriacao())
+                    .dataAtualizacao(now)
+                    .status(LoanStatus.PENDING_DOCUMENTS)
+                    .build();
+        }
+
         // Salvar empréstimo
-        Loan savedLoan = loanRepository.save(loanCompleto);
+        Loan savedLoan = loanRepository.save(loan);
 
         // Retornar resposta
-        return mapper.toResponse(savedLoan);
-    }
-
-    private void validateCommand(LoanCreationCommand command) {
-        if (command.getValorSolicitado() == null || command.getValorSolicitado().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ValidationException("Valor solicitado deve ser maior que zero.");
-        }
-
-        if (command.getDataPrevistaDevolucao() == null || command.getDataPrevistaDevolucao().isBefore(Instant.now())) {
-            throw new ValidationException("Data prevista de devolução deve ser futura.");
-        }
+        return responseAssembler.toResponse(savedLoan);
     }
 }
 

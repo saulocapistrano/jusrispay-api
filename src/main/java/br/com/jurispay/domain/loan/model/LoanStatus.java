@@ -5,6 +5,20 @@ package br.com.jurispay.domain.loan.model;
  */
 public enum LoanStatus {
     /**
+     * Solicitação de empréstimo criada e aguardando análise.
+     */
+    REQUESTED,
+
+    /**
+     * Solicitação criada, porém pendente de documentos/validação de KYC.
+     */
+    PENDING_DOCUMENTS,
+
+    APPROVED,
+
+    CREDITED,
+
+    /**
      * Empréstimo criado/ativo.
      */
     OPEN,
@@ -22,6 +36,11 @@ public enum LoanStatus {
     /**
      * Empréstimo cancelado.
      */
-    CANCELED
+    CANCELED,
+
+    /**
+     * Solicitação reprovada na análise.
+     */
+    REJECTED
 }
 

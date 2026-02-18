@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="021-create-system-config" author="jurispay">
+        <createTable tableName="system_config">
+            <column name="id" type="BIGINT" autoIncrement="false">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="brand_name" type="VARCHAR(120)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="contact_email" type="VARCHAR(180)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="contact_phone" type="VARCHAR(40)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="cnpj" type="VARCHAR(30)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="logo_original_file_name" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="logo_content_type" type="VARCHAR(120)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="logo_size_bytes" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="logo_bucket" type="VARCHAR(120)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="logo_object_key" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="system_config" indexName="idx_system_config_logo_object_key" unique="false">
+            <column name="logo_object_key"/>
+        </createIndex>
+
+        <insert tableName="system_config">
+            <column name="id" valueNumeric="1"/>
+            <column name="brand_name" value="Jurispay"/>
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="004-create-document" author="jurispay">
+        <createTable tableName="document">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="customer_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="loan_id" type="BIGINT"/>
+            
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="original_file_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="content_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="size_bytes" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="bucket" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="object_key" type="VARCHAR(500)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            
+            <column name="uploaded_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="validated_at" type="TIMESTAMP"/>
+            
+            <column name="notes" type="VARCHAR(1000)"/>
+        </createTable>
+
+        <!-- Índice para customer_id (melhora performance de buscas por cliente) -->
+        <createIndex
+            tableName="document"
+            indexName="idx_document_customer_id">
+            <column name="customer_id"/>
+        </createIndex>
+
+        <!-- Índice para loan_id (melhora performance de buscas por empréstimo) -->
+        <createIndex
+            tableName="document"
+            indexName="idx_document_loan_id">
+            <column name="loan_id"/>
+        </createIndex>
+
+        <!-- Índice composto para (customer_id, type) (útil para buscar documentos específicos de um cliente) -->
+        <createIndex
+            tableName="document"
+            indexName="idx_document_customer_type">
+            <column name="customer_id"/>
+            <column name="type"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
+
