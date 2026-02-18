@@ -56,8 +56,8 @@ class LoanFactoryTest {
         assertEquals(dataPrevistaDevolucao, loan.getDataPrevistaDevolucao());
         assertEquals(taxaJuros, loan.getTaxaJuros());
         assertEquals(multaDiaria, loan.getMultaDiaria());
-        assertEquals(LoanStatus.OPEN, loan.getStatus());
-        assertEquals(now, loan.getDataLiberacao());
+        assertEquals(LoanStatus.REQUESTED, loan.getStatus());
+        assertNull(loan.getDataLiberacao());
         assertEquals(now, loan.getDataCriacao());
         assertEquals(now, loan.getDataAtualizacao());
 
@@ -105,7 +105,7 @@ class LoanFactoryTest {
         Loan loan = loanFactory.create(data, loanPolicy, Instant.now());
 
         // Then
-        assertEquals(LoanStatus.OPEN, loan.getStatus());
+        assertEquals(LoanStatus.REQUESTED, loan.getStatus());
     }
 
     @Test
