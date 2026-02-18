@@ -52,3 +52,6 @@ databaseChangeLog:
   - include:
       file: classpath:db/changelog/changesets/021-create-system-config.xml
 
+  - include:
+      file: classpath:db/changelog/changesets/022-create-user-profile-preferences.xml
+
