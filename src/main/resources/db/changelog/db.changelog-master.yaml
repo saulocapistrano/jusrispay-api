@@ -43,3 +43,9 @@ databaseChangeLog:
   - include:
       file: classpath:db/changelog/changesets/018-create-credit-decision-override.xml
 
+  - include:
+      file: classpath:db/changelog/changesets/019-create-fine.xml
+
+  - include:
+      file: classpath:db/changelog/changesets/020-alter-payment-add-fine.xml
+
