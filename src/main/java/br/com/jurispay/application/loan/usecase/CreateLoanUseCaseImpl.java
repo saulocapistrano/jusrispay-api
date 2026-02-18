@@ -11,9 +11,12 @@ import br.com.jurispay.domain.customer.repository.CustomerRepository;
 import br.com.jurispay.domain.loan.factory.LoanCreationData;
 import br.com.jurispay.domain.loan.factory.LoanFactory;
 import br.com.jurispay.domain.loan.model.Loan;
+import br.com.jurispay.domain.loan.model.LoanPaymentPeriod;
 import br.com.jurispay.domain.loan.model.LoanStatus;
 import br.com.jurispay.domain.loan.policy.LoanPolicy;
 import br.com.jurispay.domain.loan.repository.LoanRepository;
+import br.com.jurispay.domain.loan.service.InstallmentScheduleService;
+import br.com.jurispay.domain.loantype.model.LoanType;
 import br.com.jurispay.domain.loantype.repository.LoanTypeRepository;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +36,7 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
     private final LoanPolicy loanPolicy;
     private final CustomerKycService customerKycService;
     private final LoanTypeRepository loanTypeRepository;
+    private final InstallmentScheduleService installmentScheduleService;
 
     public CreateLoanUseCaseImpl(
             LoanRepository loanRepository,
@@ -42,7 +46,8 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
             LoanFactory loanFactory,
             LoanPolicy loanPolicy,
             CustomerKycService customerKycService,
-            LoanTypeRepository loanTypeRepository) {
+            LoanTypeRepository loanTypeRepository,
+            InstallmentScheduleService installmentScheduleService) {
         this.loanRepository = loanRepository;
         this.customerRepository = customerRepository;
         this.responseAssembler = responseAssembler;
@@ -51,10 +56,20 @@ public class CreateLoanUseCaseImpl implements CreateLoanUseCase {
         this.loanPolicy = loanPolicy;
         this.customerKycService = customerKycService;
         this.loanTypeRepository = loanTypeRepository;
+        this.installmentScheduleService = installmentScheduleService;
     }
 
     @Override
     public LoanResponse create(LoanCreationCommand command) {
+        if (command != null && command.getPeriodoPagamento() == null && command.getLoanTypeId() != null) {
+            LoanType loanType = loanTypeRepository.findById(command.getLoanTypeId())
+                    .orElse(null);
+            if (loanType != null) {
+                LoanPaymentPeriod resolved = installmentScheduleService.resolvePaymentPeriod(loanType);
+                command.setPeriodoPagamento(resolved);
+            }
+        }
+
         // Validações de negócio
         validator.validate(command);
 
