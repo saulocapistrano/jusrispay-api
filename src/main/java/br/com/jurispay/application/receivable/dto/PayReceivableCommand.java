@@ -13,4 +13,9 @@ public class PayReceivableCommand {
 
     private Long receivableId;
     private Boolean adimplente;
+
+    private ReceivablePaymentType paymentType;
+
+    private Long fineId;
+    private Integer fineTimes;
 }
