@@ -3,11 +3,14 @@ package br.com.jurispay.application.document.usecase;
 import br.com.jurispay.application.document.dto.DocumentResponse;
 import br.com.jurispay.application.document.dto.DocumentValidationCommand;
 import br.com.jurispay.application.document.mapper.DocumentApplicationMapper;
+import br.com.jurispay.application.document.validator.DocumentValidationCommandValidator;
+import br.com.jurispay.application.customer.service.CustomerKycService;
 import br.com.jurispay.domain.exception.common.NotFoundException;
 import br.com.jurispay.domain.document.model.Document;
 import br.com.jurispay.domain.document.model.DocumentStatus;
 import br.com.jurispay.domain.document.model.DocumentType;
 import br.com.jurispay.domain.document.repository.DocumentRepository;
+import br.com.jurispay.domain.loan.repository.LoanRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +33,15 @@ class ValidateDocumentUseCaseImplTest {
 
     @Mock
     private DocumentApplicationMapper mapper;
+
+    @Mock
+    private DocumentValidationCommandValidator validator;
+
+    @Mock
+    private CustomerKycService customerKycService;
+
+    @Mock
+    private LoanRepository loanRepository;
 
     @InjectMocks
     private ValidateDocumentUseCaseImpl useCase;
@@ -78,6 +90,7 @@ class ValidateDocumentUseCaseImplTest {
     @Test
     void shouldValidateDocumentWhenValidData() {
         // Given
+        doNothing().when(validator).validate(any(DocumentValidationCommand.class));
         when(documentRepository.findById(1L)).thenReturn(Optional.of(document));
         when(documentRepository.save(any(Document.class))).thenReturn(document);
         when(mapper.toResponse(any(Document.class))).thenReturn(response);
@@ -96,6 +109,7 @@ class ValidateDocumentUseCaseImplTest {
     @Test
     void shouldThrowNotFoundExceptionWhenDocumentDoesNotExist() {
         // Given
+        doNothing().when(validator).validate(any(DocumentValidationCommand.class));
         when(documentRepository.findById(1L)).thenReturn(Optional.empty());
 
         // When/Then
