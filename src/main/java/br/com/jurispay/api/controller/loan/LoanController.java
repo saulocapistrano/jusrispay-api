@@ -2,6 +2,8 @@ package br.com.jurispay.api.controller.loan;
 
 import br.com.jurispay.api.dto.loan.LoanRequest;
 import br.com.jurispay.api.mapper.loan.LoanRequestToCommandMapper;
+import br.com.jurispay.application.risk.dto.LoanRiskAssessmentResponse;
+import br.com.jurispay.application.risk.usecase.GetLoanRiskAssessmentUseCase;
 import br.com.jurispay.application.loan.dto.LoanResponse;
 import br.com.jurispay.application.loan.usecase.CreateLoanUseCase;
 import br.com.jurispay.application.loan.usecase.CreditLoanUseCase;
@@ -30,6 +32,7 @@ public class LoanController {
     private final CreditLoanUseCase creditLoanUseCase;
     private final SyncLoanStatusFromCreditAnalysisUseCase syncLoanStatusFromCreditAnalysisUseCase;
     private final LoanRequestToCommandMapper requestMapper;
+    private final GetLoanRiskAssessmentUseCase getLoanRiskAssessmentUseCase;
 
     public LoanController(
             CreateLoanUseCase createLoanUseCase,
@@ -37,13 +40,15 @@ public class LoanController {
             ListLoansUseCase listLoansUseCase,
             CreditLoanUseCase creditLoanUseCase,
             SyncLoanStatusFromCreditAnalysisUseCase syncLoanStatusFromCreditAnalysisUseCase,
-            LoanRequestToCommandMapper requestMapper) {
+            LoanRequestToCommandMapper requestMapper,
+            GetLoanRiskAssessmentUseCase getLoanRiskAssessmentUseCase) {
         this.createLoanUseCase = createLoanUseCase;
         this.getLoanByIdUseCase = getLoanByIdUseCase;
         this.listLoansUseCase = listLoansUseCase;
         this.creditLoanUseCase = creditLoanUseCase;
         this.syncLoanStatusFromCreditAnalysisUseCase = syncLoanStatusFromCreditAnalysisUseCase;
         this.requestMapper = requestMapper;
+        this.getLoanRiskAssessmentUseCase = getLoanRiskAssessmentUseCase;
     }
 
     @PostMapping
@@ -82,6 +87,12 @@ public class LoanController {
     @PostMapping("/{id}/sync-status-from-analysis")
     public ResponseEntity<LoanResponse> syncStatusFromAnalysis(@PathVariable Long id) {
         LoanResponse response = syncLoanStatusFromCreditAnalysisUseCase.sync(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/risk-assessment")
+    public ResponseEntity<LoanRiskAssessmentResponse> getRiskAssessment(@PathVariable Long id) {
+        LoanRiskAssessmentResponse response = getLoanRiskAssessmentUseCase.getByLoanId(id);
         return ResponseEntity.ok(response);
     }
 }
