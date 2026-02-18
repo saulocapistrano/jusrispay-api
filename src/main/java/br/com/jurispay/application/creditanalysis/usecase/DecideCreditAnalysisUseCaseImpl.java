@@ -2,6 +2,7 @@ package br.com.jurispay.application.creditanalysis.usecase;
 
 import br.com.jurispay.application.creditcheck.usecase.RunCreditCheckUseCase;
 import br.com.jurispay.application.creditcheck.usecase.GetLatestCreditCheckByLoanUseCase;
+import br.com.jurispay.application.risk.usecase.AttachJurispayRiskAssessmentToLatestCreditCheckUseCase;
 import br.com.jurispay.application.creditanalysis.dto.CreditAnalysisDecisionCommand;
 import br.com.jurispay.application.creditanalysis.dto.CreditAnalysisResponse;
 import br.com.jurispay.application.creditanalysis.mapper.CreditAnalysisApplicationMapper;
@@ -50,6 +51,7 @@ public class DecideCreditAnalysisUseCaseImpl implements DecideCreditAnalysisUseC
     private final RunCreditCheckUseCase runCreditCheckUseCase;
     private final GetLatestCreditCheckByLoanUseCase getLatestCreditCheckByLoanUseCase;
     private final CreditDecisionOverrideRepository creditDecisionOverrideRepository;
+    private final AttachJurispayRiskAssessmentToLatestCreditCheckUseCase attachJurispayRiskAssessmentToLatestCreditCheckUseCase;
 
     public DecideCreditAnalysisUseCaseImpl(
             CreditAnalysisRepository creditAnalysisRepository,
@@ -62,7 +64,8 @@ public class DecideCreditAnalysisUseCaseImpl implements DecideCreditAnalysisUseC
             CustomerRepository customerRepository,
             RunCreditCheckUseCase runCreditCheckUseCase,
             GetLatestCreditCheckByLoanUseCase getLatestCreditCheckByLoanUseCase,
-            CreditDecisionOverrideRepository creditDecisionOverrideRepository) {
+            CreditDecisionOverrideRepository creditDecisionOverrideRepository,
+            AttachJurispayRiskAssessmentToLatestCreditCheckUseCase attachJurispayRiskAssessmentToLatestCreditCheckUseCase) {
         this.creditAnalysisRepository = creditAnalysisRepository;
         this.loanRepository = loanRepository;
         this.loanTypeRepository = loanTypeRepository;
@@ -74,6 +77,7 @@ public class DecideCreditAnalysisUseCaseImpl implements DecideCreditAnalysisUseC
         this.runCreditCheckUseCase = runCreditCheckUseCase;
         this.getLatestCreditCheckByLoanUseCase = getLatestCreditCheckByLoanUseCase;
         this.creditDecisionOverrideRepository = creditDecisionOverrideRepository;
+        this.attachJurispayRiskAssessmentToLatestCreditCheckUseCase = attachJurispayRiskAssessmentToLatestCreditCheckUseCase;
     }
 
     @Override
@@ -151,6 +155,8 @@ public class DecideCreditAnalysisUseCaseImpl implements DecideCreditAnalysisUseC
                     .getCpf();
 
             runCreditCheckUseCase.run(loan.getId(), loan.getCustomerId(), cpf, command.getAnalystUserId());
+
+            attachJurispayRiskAssessmentToLatestCreditCheckUseCase.attach(loan.getId());
 
             var creditCheckSummaryOpt = getLatestCreditCheckByLoanUseCase.getByLoanId(loan.getId());
             if (creditCheckSummaryOpt.isEmpty()) {
