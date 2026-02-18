@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="012-create-receivable" author="jurispay">
+        <createTable tableName="receivable">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="loan_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="installment_number" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="due_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="amount" type="NUMERIC(19,2)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="paid_at" type="TIMESTAMP"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="receivable"
+            baseColumnNames="loan_id"
+            referencedTableName="loan"
+            referencedColumnNames="id"
+            constraintName="fk_receivable_loan"/>
+
+        <createIndex tableName="receivable" indexName="idx_receivable_loan_id">
+            <column name="loan_id"/>
+        </createIndex>
+
+        <createIndex tableName="receivable" indexName="idx_receivable_due_date">
+            <column name="due_date"/>
+        </createIndex>
+
+        <createIndex tableName="receivable" indexName="idx_receivable_status">
+            <column name="status"/>
+        </createIndex>
+
+        <addUniqueConstraint
+            tableName="receivable"
+            columnNames="loan_id, installment_number"
+            constraintName="uk_receivable_loan_installment"/>
+    </changeSet>
+
+</databaseChangeLog>

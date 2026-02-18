@@ -18,5 +18,6 @@ public interface PaymentRepository {
     List<Payment> findAll();
 
     List<Payment> findByLoanId(Long loanId);
-}
 
+    Optional<java.time.Instant> findLastPaymentAtByLoanIds(List<Long> loanIds);
+}

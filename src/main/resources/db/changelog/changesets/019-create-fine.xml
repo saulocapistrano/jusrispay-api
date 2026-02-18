@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="019-create-fine" author="jurispay">
+        <createTable tableName="fine">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="nome" type="VARCHAR(80)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="valor" type="NUMERIC(19,2)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="ativo" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="data_criacao" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="data_atualizacao" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="fine" columnNames="nome" constraintName="uk_fine_nome"/>
+
+        <createIndex tableName="fine" indexName="idx_fine_ativo">
+            <column name="ativo"/>
+        </createIndex>
+
+        <createIndex tableName="fine" indexName="idx_fine_valor">
+            <column name="valor"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

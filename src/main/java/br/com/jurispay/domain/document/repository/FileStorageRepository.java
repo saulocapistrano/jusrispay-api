@@ -36,5 +36,15 @@ public interface FileStorageRepository {
      * @param objectKey chave/KEY do objeto
      */
     void delete(String bucket, String objectKey);
+
+    /**
+     * Obtém o conteúdo binário de um arquivo do storage.
+     *
+     * @param bucket nome do bucket
+     * @param objectKey chave/KEY do objeto
+     * @return bytes do arquivo
+     * @throws RuntimeException se o arquivo não for encontrado ou ocorrer erro
+     */
+    byte[] getBytes(String bucket, String objectKey);
 }
 

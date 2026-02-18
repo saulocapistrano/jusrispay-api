@@ -20,8 +20,12 @@ public class ErrorResponse {
     private Instant timestamp;
     private int status;
     private String error;
+    private String code;
     private String message;
     private String path;
     private String traceId;
+
+    private String exceptionClass;
+    private String debugMessage;
 }
 

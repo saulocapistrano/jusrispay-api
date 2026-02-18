@@ -5,4 +5,50 @@ databaseChangeLog:
       file: classpath:db/changelog/changesets/002-create-loan.xml
   - include:
       file: classpath:db/changelog/changesets/003-create-payment.xml
+  - include:
+      file: classpath:db/changelog/changesets/004-create-document.xml
+  - include:
+      file: classpath:db/changelog/changesets/005-create-credit-analysis.xml
+  - include:
+      file: classpath:db/changelog/changesets/006-create-collection-action.xml
+  - include:
+      file: classpath:db/changelog/changesets/007-alter-document-add-loan-id.xml
+  - include:
+      file: classpath:db/changelog/changesets/008-alter-loan-credit-analysis-for-loan-workflow.xml
+  - include:
+      file: classpath:db/changelog/changesets/009-alter-customer-add-registration-fields.xml
+  - include:
+      file: classpath:db/changelog/changesets/010-alter-loan-add-repayment-fields.xml
+  - include:
+      file: classpath:db/changelog/changesets/011-create-view-vw-loan-with-customer.xml
+
+  - include:
+      file: classpath:db/changelog/changesets/012-create-receivable.xml
+
+  - include:
+      file: classpath:db/changelog/changesets/013-create-wallet.xml
+
+  - include:
+      file: classpath:db/changelog/changesets/014-create-loan-type.xml
+
+  - include:
+      file: classpath:db/changelog/changesets/015-alter-loan-add-loan-type-id.xml
+
+  - include:
+      file: classpath:db/changelog/changesets/016-alter-loan-type-add-schedule-fields.xml
+
+  - include:
+      file: classpath:db/changelog/changesets/017-create-credit-check.xml
+
+  - include:
+      file: classpath:db/changelog/changesets/018-create-credit-decision-override.xml
+
+  - include:
+      file: classpath:db/changelog/changesets/019-create-fine.xml
+
+  - include:
+      file: classpath:db/changelog/changesets/020-alter-payment-add-fine.xml
+
+  - include:
+      file: classpath:db/changelog/changesets/021-create-system-config.xml
 

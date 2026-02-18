@@ -176,12 +176,58 @@ docker compose down
 docker compose down -v
 ```
 
+### Portas dos Serviços
+
+O projeto utiliza portas não padrão para evitar conflitos com outros projetos Docker:
+
+| Serviço | Porta Externa | Porta Interna | URL |
+|---------|---------------|---------------|-----|
+| **API** | 18080 | 8080 | http://localhost:18080 |
+| **PostgreSQL** | 15432 | 5432 | localhost:15432 |
+| **MinIO API** | 19000 | 9000 | http://localhost:19000 |
+| **MinIO Console** | 19001 | 9001 | http://localhost:19001 |
+
+**Nota:** As portas internas são mantidas para comunicação entre containers. Apenas as portas externas foram alteradas.
+
 ### Acessar a API
 
 Após subir os containers, a API estará disponível em:
 
-- **Swagger UI:** http://localhost:8080/swagger-ui.html
-- **API Base:** http://localhost:8080/api
+- **Swagger UI:** http://localhost:18080/swagger-ui.html
+- **API Base:** http://localhost:18080/api
+
+### Smoke Test
+
+Após subir os containers, execute os seguintes testes para validar que tudo está funcionando:
+
+#### 1. Health Check da API
+
+```bash
+curl http://localhost:18080/actuator/health
+```
+
+Resposta esperada:
+```json
+{"status":"UP"}
+```
+
+#### 2. Swagger UI
+
+Acesse no navegador:
+```
+http://localhost:18080/swagger-ui/index.html
+```
+
+#### 3. MinIO Console
+
+Acesse no navegador:
+```
+http://localhost:19001
+```
+
+**Credenciais:**
+- Access Key: `jurispay`
+- Secret Key: `jurispay123`
 
 ### Estrutura Docker
 
@@ -202,7 +248,7 @@ O Jurispay utiliza **MinIO** como serviço de armazenamento de objetos compatív
 
 Após subir os containers, acesse o console web do MinIO em:
 
-**http://localhost:9001**
+**http://localhost:19001**
 
 **Credenciais:**
 - **Access Key:** `jurispay`
@@ -228,7 +274,7 @@ jurispay.filestorage.endpoint=http://minio:9000
 jurispay.filestorage.access-key=jurispay
 jurispay.filestorage.secret-key=jurispay123
 jurispay.filestorage.region=us-east-1
-jurispay.filestorage.public-base-url=http://localhost:9000/jurispay-documents
+jurispay.filestorage.public-base-url=http://localhost:19000/jurispay-documents
 ```
 
 ### ⚠️ Segurança e LGPD

@@ -32,6 +32,10 @@ public class PaymentEntity {
     @JoinColumn(name = "loan_id", nullable = false)
     private LoanEntity loan;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fine_id")
+    private FineEntity fine;
+
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal valorPago;
 
@@ -43,6 +47,15 @@ public class PaymentEntity {
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal multaTotal;
+
+    @Column(name = "fine_times")
+    private Integer fineTimes;
+
+    @Column(name = "fine_unit_amount", precision = 19, scale = 2)
+    private BigDecimal fineUnitAmount;
+
+    @Column(name = "fine_total_amount", precision = 19, scale = 2)
+    private BigDecimal fineTotalAmount;
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal valorFinalRecebido;

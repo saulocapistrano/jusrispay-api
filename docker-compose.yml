@@ -1,17 +1,16 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:16
-    container_name: jurispay-db
     environment:
       POSTGRES_DB: jurispay
       POSTGRES_USER: jurispay
       POSTGRES_PASSWORD: jurispay
     ports:
-      - "5432:5432"
+      - "15432:5432"
     volumes:
       - jurispay_pgdata:/var/lib/postgresql/data
+    networks:
+      - jurispay_backend
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U jurispay -d jurispay"]
       interval: 5s
@@ -20,31 +19,31 @@ services:
 
   minio:
     image: minio/minio:latest
-    container_name: jurispay-minio
     ports:
-      - "9000:9000"   # API S3
-      - "9001:9001"   # Console web
+      - "19000:9000"   # API S3
+      - "19001:9001"   # Console web
     environment:
       MINIO_ROOT_USER: jurispay
       MINIO_ROOT_PASSWORD: jurispay123
     command: server /data --console-address ":9001"
     volumes:
       - jurispay_minio_data:/data
-    healthcheck:
-      test: ["CMD-SHELL", "mc ready local || exit 1"]
-      interval: 5s
-      timeout: 3s
-      retries: 20
+    networks:
+      - jurispay_backend
 
   minio-init:
     image: minio/mc:latest
-    container_name: jurispay-minio-init
     depends_on:
       minio:
-        condition: service_healthy
+        condition: service_started
+    networks:
+      - jurispay_backend
     entrypoint: >
       /bin/sh -c "
-      mc alias set jurispay http://minio:9000 jurispay jurispay123;
+      until mc alias set jurispay http://minio:9000 jurispay jurispay123; do
+        echo 'Waiting for MinIO...';
+        sleep 2;
+      done;
       mc mb -p jurispay/jurispay-documents || true;
       mc anonymous set none jurispay/jurispay-documents || true;
       echo 'MinIO bucket ready';
@@ -54,16 +53,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: jurispay-api
     environment:
       SPRING_PROFILES_ACTIVE: docker
     ports:
-      - "8080:8080"
+      - "18080:8080"
+    networks:
+      - jurispay_backend
     depends_on:
       db:
         condition: service_healthy
       minio:
-        condition: service_healthy
+        condition: service_started
+
+networks:
+  jurispay_backend:
+    driver: bridge
 
 volumes:
   jurispay_pgdata:

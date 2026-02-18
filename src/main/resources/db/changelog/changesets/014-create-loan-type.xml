@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="014-create-loan-type" author="jurispay">
+        <createTable tableName="loan_type">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="nome" type="VARCHAR(80)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="descricao" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="intervalo_pagamento_dias" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="ativo" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="data_criacao" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="data_atualizacao" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="loan_type" columnNames="nome" constraintName="uk_loan_type_nome"/>
+
+        <createIndex tableName="loan_type" indexName="idx_loan_type_ativo">
+            <column name="ativo"/>
+        </createIndex>
+
+        <createIndex tableName="loan_type" indexName="idx_loan_type_intervalo">
+            <column name="intervalo_pagamento_dias"/>
+        </createIndex>
+
+        <insert tableName="loan_type">
+            <column name="id" valueNumeric="1"/>
+            <column name="nome" value="Diário"/>
+            <column name="descricao" value="Pagamento todos os dias"/>
+            <column name="intervalo_pagamento_dias" valueNumeric="1"/>
+            <column name="ativo" valueBoolean="true"/>
+            <column name="data_criacao" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="data_atualizacao" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="loan_type">
+            <column name="id" valueNumeric="2"/>
+            <column name="nome" value="Semanal (Domingo)"/>
+            <column name="descricao" value="Pagamento todo domingo"/>
+            <column name="intervalo_pagamento_dias" valueNumeric="7"/>
+            <column name="ativo" valueBoolean="true"/>
+            <column name="data_criacao" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="data_atualizacao" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="loan_type">
+            <column name="id" valueNumeric="7"/>
+            <column name="nome" value="Semanal (Sábado)"/>
+            <column name="descricao" value="Pagamento todo sábado"/>
+            <column name="intervalo_pagamento_dias" valueNumeric="7"/>
+            <column name="ativo" valueBoolean="true"/>
+            <column name="data_criacao" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="data_atualizacao" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="loan_type">
+            <column name="id" valueNumeric="3"/>
+            <column name="nome" value="10 dias"/>
+            <column name="descricao" value="Pagamento a cada 10 dias"/>
+            <column name="intervalo_pagamento_dias" valueNumeric="10"/>
+            <column name="ativo" valueBoolean="true"/>
+            <column name="data_criacao" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="data_atualizacao" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="loan_type">
+            <column name="id" valueNumeric="4"/>
+            <column name="nome" value="15 dias"/>
+            <column name="descricao" value="Pagamento a cada 15 dias"/>
+            <column name="intervalo_pagamento_dias" valueNumeric="15"/>
+            <column name="ativo" valueBoolean="true"/>
+            <column name="data_criacao" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="data_atualizacao" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="loan_type">
+            <column name="id" valueNumeric="5"/>
+            <column name="nome" value="20 dias"/>
+            <column name="descricao" value="Pagamento a cada 20 dias"/>
+            <column name="intervalo_pagamento_dias" valueNumeric="20"/>
+            <column name="ativo" valueBoolean="true"/>
+            <column name="data_criacao" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="data_atualizacao" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="loan_type">
+            <column name="id" valueNumeric="6"/>
+            <column name="nome" value="30 dias"/>
+            <column name="descricao" value="Pagamento a cada 30 dias"/>
+            <column name="intervalo_pagamento_dias" valueNumeric="30"/>
+            <column name="ativo" valueBoolean="true"/>
+            <column name="data_criacao" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="data_atualizacao" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

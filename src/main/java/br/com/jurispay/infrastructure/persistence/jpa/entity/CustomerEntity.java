@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 
 /**
  * Entidade JPA para Customer.
@@ -30,8 +31,46 @@ public class CustomerEntity {
     @Column(nullable = false)
     private String nomeCompleto;
 
+    private Integer idade;
+
     @Column(nullable = false, unique = true)
     private String cpf;
+
+    private String rg;
+
+    private LocalDate dataNasc;
+
+    private String sexo;
+
+    private String signo;
+
+    private String mae;
+
+    private String pai;
+
+    private String email;
+
+    private String senhaHash;
+
+    private String cep;
+
+    private String endereco;
+
+    private Integer numero;
+
+    private String bairro;
+
+    private String cidade;
+
+    private String estado;
+
+    private String telefoneFixo;
+
+    private String celular;
+
+    private Boolean bemGarantidor;
+
+    private String descricaoBem;
 
     @Column(nullable = false)
     private String telefone;

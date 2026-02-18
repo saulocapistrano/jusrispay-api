@@ -20,8 +20,10 @@ public interface LoanApplicationMapper {
     @Mapping(target = "taxaJuros", ignore = true)
     @Mapping(target = "multaDiaria", ignore = true)
     @Mapping(target = "status", ignore = true)
+    @Mapping(target = "quantidadeParcelas", ignore = true)
+    @Mapping(target = "valorParcela", ignore = true)
     Loan toDomain(LoanCreationCommand command);
 
+    @Mapping(target = "customerName", ignore = true)
     LoanResponse toResponse(Loan loan);
 }
-

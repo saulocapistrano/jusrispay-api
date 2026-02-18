@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="005-create-credit-analysis" author="jurispay">
+        <createTable tableName="credit_analysis">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="customer_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="analyst_user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="started_at" type="TIMESTAMP"/>
+            
+            <column name="finished_at" type="TIMESTAMP"/>
+            
+            <column name="decision_deadline_at" type="TIMESTAMP"/>
+            
+            <column name="rejection_reason" type="TEXT"/>
+            
+            <column name="notes" type="TEXT"/>
+            
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Unique constraint para customer_id (1 análise ativa por cliente) -->
+        <addUniqueConstraint
+            tableName="credit_analysis"
+            columnNames="customer_id"
+            constraintName="uk_credit_analysis_customer_id"/>
+
+        <!-- Índice para customer_id (melhora performance de buscas) -->
+        <createIndex
+            tableName="credit_analysis"
+            indexName="idx_credit_analysis_customer_id">
+            <column name="customer_id"/>
+        </createIndex>
+
+        <!-- Índice para status (útil para filtros) -->
+        <createIndex
+            tableName="credit_analysis"
+            indexName="idx_credit_analysis_status">
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
+
