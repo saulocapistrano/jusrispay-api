@@ -25,6 +25,10 @@ public class Payment {
     private Instant dataPagamento;
     private int diasAtraso;
     private BigDecimal multaTotal;
+    private Long fineId;
+    private Integer fineTimes;
+    private BigDecimal fineUnitAmount;
+    private BigDecimal fineTotalAmount;
     private BigDecimal valorFinalRecebido;
     private BigDecimal roiBrl;
     private BigDecimal roiPercent;
