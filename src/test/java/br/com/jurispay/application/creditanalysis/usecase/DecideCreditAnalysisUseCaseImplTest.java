@@ -1,10 +1,17 @@
 package br.com.jurispay.application.creditanalysis.usecase;
 
 import br.com.jurispay.application.creditanalysis.mapper.CreditAnalysisApplicationMapper;
+import br.com.jurispay.application.creditanalysis.service.CreditAnalysisDecisionValidator;
+import br.com.jurispay.application.creditcheck.usecase.GetLatestCreditCheckByLoanUseCase;
+import br.com.jurispay.application.creditcheck.usecase.RunCreditCheckUseCase;
+import br.com.jurispay.application.customer.service.CustomerKycService;
+import br.com.jurispay.application.risk.usecase.AttachJurispayRiskAssessmentToLatestCreditCheckUseCase;
 import br.com.jurispay.domain.creditanalysis.repository.CreditAnalysisRepository;
-import br.com.jurispay.domain.creditanalysis.service.CreditAnalysisDomainService;
+import br.com.jurispay.domain.creditdecisionoverride.repository.CreditDecisionOverrideRepository;
 import br.com.jurispay.domain.customer.repository.CustomerRepository;
-import br.com.jurispay.domain.document.repository.DocumentRepository;
+import br.com.jurispay.domain.loan.repository.LoanRepository;
+import br.com.jurispay.domain.loan.service.InstallmentScheduleService;
+import br.com.jurispay.domain.loantype.repository.LoanTypeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,13 +28,34 @@ class DecideCreditAnalysisUseCaseImplTest {
     private CreditAnalysisRepository creditAnalysisRepository;
 
     @Mock
+    private LoanRepository loanRepository;
+
+    @Mock
+    private LoanTypeRepository loanTypeRepository;
+
+    @Mock
+    private CreditAnalysisDecisionValidator decisionValidator;
+
+    @Mock
+    private CustomerKycService customerKycService;
+
+    @Mock
+    private InstallmentScheduleService scheduleService;
+
+    @Mock
     private CustomerRepository customerRepository;
 
     @Mock
-    private DocumentRepository documentRepository;
+    private RunCreditCheckUseCase runCreditCheckUseCase;
 
     @Mock
-    private CreditAnalysisDomainService domainService;
+    private GetLatestCreditCheckByLoanUseCase getLatestCreditCheckByLoanUseCase;
+
+    @Mock
+    private CreditDecisionOverrideRepository creditDecisionOverrideRepository;
+
+    @Mock
+    private AttachJurispayRiskAssessmentToLatestCreditCheckUseCase attachJurispayRiskAssessmentToLatestCreditCheckUseCase;
 
     @Mock
     private CreditAnalysisApplicationMapper mapper;
