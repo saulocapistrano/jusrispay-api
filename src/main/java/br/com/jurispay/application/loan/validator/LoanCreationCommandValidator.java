@@ -4,6 +4,7 @@ import br.com.jurispay.application.common.validator.CommandValidator;
 import br.com.jurispay.application.loan.dto.LoanCreationCommand;
 import br.com.jurispay.domain.exception.common.ErrorCode;
 import br.com.jurispay.domain.exception.common.ValidationException;
+import br.com.jurispay.domain.loan.model.LoanPaymentPeriod;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -15,6 +16,9 @@ import java.time.Instant;
  */
 @Component
 public class LoanCreationCommandValidator implements CommandValidator<LoanCreationCommand> {
+
+    private static final BigDecimal MIN_INTEREST_RATE_DAILY = new BigDecimal("0.35");
+    private static final BigDecimal MIN_INTEREST_RATE_NON_DAILY = new BigDecimal("0.08");
 
     @Override
     public void validate(LoanCreationCommand command) {
@@ -30,8 +34,13 @@ public class LoanCreationCommandValidator implements CommandValidator<LoanCreati
             throw new ValidationException(ErrorCode.REQUIRED_FIELD, "Taxa de juros é obrigatória.");
         }
 
-        if (command.getTaxaJuros().compareTo(new BigDecimal("0.35")) < 0 || command.getTaxaJuros().compareTo(BigDecimal.ONE) > 0) {
-            throw new ValidationException(ErrorCode.INVALID_VALUE, "Taxa de juros deve estar entre 35% e 100%.");
+        LoanPaymentPeriod periodoPagamento = command.getPeriodoPagamento();
+        boolean isDaily = periodoPagamento == null || periodoPagamento == LoanPaymentPeriod.DAILY;
+
+        BigDecimal minRate = isDaily ? MIN_INTEREST_RATE_DAILY : MIN_INTEREST_RATE_NON_DAILY;
+        if (command.getTaxaJuros().compareTo(minRate) < 0 || command.getTaxaJuros().compareTo(BigDecimal.ONE) > 0) {
+            String minPercent = isDaily ? "35%" : "8%";
+            throw new ValidationException(ErrorCode.INVALID_VALUE, "Taxa de juros deve estar entre " + minPercent + " e 100%.");
         }
 
         if (command.getDataPrevistaDevolucao() == null || command.getDataPrevistaDevolucao().isBefore(Instant.now())) {
