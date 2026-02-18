@@ -19,7 +19,7 @@ import java.util.UUID;
 public class UploadSystemLogoUseCaseImpl implements UploadSystemLogoUseCase {
 
     private static final Long DEFAULT_ID = 1L;
-    private static final String DEFAULT_BUCKET = "jurispay-system";
+    private static final String DEFAULT_BUCKET = "jurispay-documents";
     private static final long MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/png", "image/jpeg", "image/webp");
 
