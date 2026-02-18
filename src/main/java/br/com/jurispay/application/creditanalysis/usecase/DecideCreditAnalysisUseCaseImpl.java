@@ -25,6 +25,7 @@ import br.com.jurispay.domain.loan.service.InstallmentScheduleService;
 import br.com.jurispay.domain.loantype.model.LoanType;
 import br.com.jurispay.domain.loantype.repository.LoanTypeRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -76,6 +77,7 @@ public class DecideCreditAnalysisUseCaseImpl implements DecideCreditAnalysisUseC
     }
 
     @Override
+    @Transactional
     public CreditAnalysisResponse decide(CreditAnalysisDecisionCommand command) {
         // Validações básicas
         if (command.getLoanId() == null) {
