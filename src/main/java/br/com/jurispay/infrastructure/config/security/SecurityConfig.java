@@ -70,6 +70,22 @@ public class SecurityConfig {
                     org.springframework.http.HttpMethod.POST,
                     "/api/contracts/pdf/**"
                 ).hasAnyRole("ADMIN", "OPERATOR")
+
+                // Configuração do sistema (branding/contatos)
+                .requestMatchers(
+                    org.springframework.http.HttpMethod.GET,
+                    "/api/system-config/**"
+                ).hasAnyRole("ADMIN", "OPERATOR", "AUDITOR")
+
+                .requestMatchers(
+                    org.springframework.http.HttpMethod.PUT,
+                    "/api/system-config/**"
+                ).hasRole("ADMIN")
+
+                .requestMatchers(
+                    org.springframework.http.HttpMethod.POST,
+                    "/api/system-config/**"
+                ).hasRole("ADMIN")
                 
                 // Endpoints de relatórios - leitura
                 .requestMatchers(
