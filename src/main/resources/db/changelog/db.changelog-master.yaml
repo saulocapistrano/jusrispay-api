@@ -55,3 +55,9 @@ databaseChangeLog:
   - include:
       file: classpath:db/changelog/changesets/022-create-user-profile-preferences.xml
 
+  - include:
+      file: classpath:db/changelog/changesets/023-alter-system-config-add-notification-fields.xml
+
+  - include:
+      file: classpath:db/changelog/changesets/024-create-notification-tables.xml
+

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="024-create-notification-tables" author="jurispay">
+        <createTable tableName="notification_template">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="code" type="VARCHAR(80)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="channel" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="content" type="VARCHAR(2000)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="notification_template" columnNames="code" constraintName="uk_notification_template_code"/>
+
+        <createTable tableName="notification_outbox">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="dedup_key" type="VARCHAR(160)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="type" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="channel" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="customer_id" type="BIGINT"/>
+            <column name="loan_id" type="BIGINT"/>
+            <column name="receivable_id" type="BIGINT"/>
+
+            <column name="to_phone" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="template_code" type="VARCHAR(80)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="rendered_message" type="VARCHAR(2500)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="provider_message_id" type="VARCHAR(120)"/>
+
+            <column name="attempts" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="next_attempt_at" type="TIMESTAMP"/>
+            <column name="last_error" type="VARCHAR(1000)"/>
+            <column name="sent_at" type="TIMESTAMP"/>
+
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="notification_outbox" columnNames="dedup_key" constraintName="uk_notification_outbox_dedup_key"/>
+
+        <createIndex tableName="notification_outbox" indexName="idx_notification_outbox_status_next_attempt">
+            <column name="status"/>
+            <column name="next_attempt_at"/>
+        </createIndex>
+
+        <createIndex tableName="notification_outbox" indexName="idx_notification_outbox_receivable">
+            <column name="receivable_id"/>
+        </createIndex>
+
+        <insert tableName="notification_template">
+            <column name="code" value="RECEIVABLE_D1"/>
+            <column name="channel" value="WHATSAPP"/>
+            <column name="content" value="Olá {{customer_name}}, lembrando que amanhã ({{due_date}}) vence sua parcela {{installment_number}}/{{total_installments}} no valor de R$ {{amount}}. Chave Pix: {{pix_key}}."/>
+            <column name="active" valueBoolean="true"/>
+        </insert>
+
+        <insert tableName="notification_template">
+            <column name="code" value="RECEIVABLE_D0"/>
+            <column name="channel" value="WHATSAPP"/>
+            <column name="content" value="Olá {{customer_name}}, hoje ({{due_date}}) vence sua parcela {{installment_number}}/{{total_installments}} no valor de R$ {{amount}}. Chave Pix: {{pix_key}}."/>
+            <column name="active" valueBoolean="true"/>
+        </insert>
+
+        <insert tableName="notification_template">
+            <column name="code" value="RECEIVABLE_OVERDUE"/>
+            <column name="channel" value="WHATSAPP"/>
+            <column name="content" value="Olá {{customer_name}}, identificamos que sua parcela {{installment_number}}/{{total_installments}} está em atraso há {{days_overdue}} dia(s). Valor: R$ {{amount}}. Chave Pix: {{pix_key}}."/>
+            <column name="active" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
