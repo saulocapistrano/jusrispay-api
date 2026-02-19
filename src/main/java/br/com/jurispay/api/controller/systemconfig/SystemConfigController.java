@@ -56,6 +56,10 @@ public class SystemConfigController {
                 .contactEmail(request.getContactEmail())
                 .contactPhone(request.getContactPhone())
                 .cnpj(request.getCnpj())
+                .pixKey(request.getPixKey())
+                .notificationTimezone(request.getNotificationTimezone())
+                .reminderDispatchTime(request.getReminderDispatchTime())
+                .collectionDispatchTime(request.getCollectionDispatchTime())
                 .build();
 
         return ResponseEntity.ok(updateSystemConfigUseCase.update(command));

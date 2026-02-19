@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.time.LocalTime;
 
 @Getter
 @Builder
@@ -19,6 +20,12 @@ public class SystemConfig {
     private String contactEmail;
     private String contactPhone;
     private String cnpj;
+
+    private String pixKey;
+
+    private String notificationTimezone;
+    private LocalTime reminderDispatchTime;
+    private LocalTime collectionDispatchTime;
 
     private String logoOriginalFileName;
     private String logoContentType;

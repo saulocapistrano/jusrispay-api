@@ -30,6 +30,10 @@ public class SystemConfigResponseAssembler {
                 .contactEmail(config.getContactEmail())
                 .contactPhone(config.getContactPhone())
                 .cnpj(config.getCnpj())
+                .pixKey(config.getPixKey())
+                .notificationTimezone(config.getNotificationTimezone())
+                .reminderDispatchTime(config.getReminderDispatchTime())
+                .collectionDispatchTime(config.getCollectionDispatchTime())
                 .hasLogo(hasLogo)
                 .logoDownloadUrl(logoDownloadUrl)
                 .build();
