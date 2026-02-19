@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "system_config")
@@ -37,6 +38,18 @@ public class SystemConfigEntity {
 
     @Column(name = "cnpj", length = 30)
     private String cnpj;
+
+    @Column(name = "pix_key", length = 255)
+    private String pixKey;
+
+    @Column(name = "notification_timezone", length = 80, nullable = false)
+    private String notificationTimezone;
+
+    @Column(name = "reminder_dispatch_time", nullable = false)
+    private LocalTime reminderDispatchTime;
+
+    @Column(name = "collection_dispatch_time", nullable = false)
+    private LocalTime collectionDispatchTime;
 
     @Column(name = "logo_original_file_name", length = 255)
     private String logoOriginalFileName;
@@ -67,6 +80,16 @@ public class SystemConfigEntity {
         }
         if (updatedAt == null) {
             updatedAt = now;
+        }
+
+        if (notificationTimezone == null || notificationTimezone.isBlank()) {
+            notificationTimezone = "America/Fortaleza";
+        }
+        if (reminderDispatchTime == null) {
+            reminderDispatchTime = LocalTime.of(9, 0);
+        }
+        if (collectionDispatchTime == null) {
+            collectionDispatchTime = LocalTime.of(10, 0);
         }
     }
 
