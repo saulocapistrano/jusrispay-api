@@ -86,6 +86,16 @@ public class SecurityConfig {
                     org.springframework.http.HttpMethod.POST,
                     "/api/system-config/**"
                 ).hasRole("ADMIN")
+
+                .requestMatchers(
+                    org.springframework.http.HttpMethod.GET,
+                    "/api/notifications/**"
+                ).hasAnyRole("ADMIN", "OPERATOR", "AUDITOR")
+
+                .requestMatchers(
+                    org.springframework.http.HttpMethod.PUT,
+                    "/api/notifications/templates/**"
+                ).hasRole("ADMIN")
                 
                 // Endpoints de relatórios - leitura
                 .requestMatchers(
