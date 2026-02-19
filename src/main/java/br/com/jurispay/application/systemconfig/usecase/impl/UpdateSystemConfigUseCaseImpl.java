@@ -10,6 +10,7 @@ import br.com.jurispay.domain.systemconfig.repository.SystemConfigRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalTime;
 
 @Service
 public class UpdateSystemConfigUseCaseImpl implements UpdateSystemConfigUseCase {
@@ -33,12 +34,31 @@ public class UpdateSystemConfigUseCaseImpl implements UpdateSystemConfigUseCase 
         var existing = repository.findById(DEFAULT_ID).orElseGet(() -> repository.save(SystemConfigDefaults.defaultConfig(DEFAULT_ID)));
         Instant now = Instant.now();
 
+        String timezone = resolveUpdatedTimezone(existing.getNotificationTimezone(), command.getNotificationTimezone());
+        LocalTime reminderTime = resolveUpdatedLocalTime(existing.getReminderDispatchTime(), command.getReminderDispatchTime());
+        LocalTime collectionTime = resolveUpdatedLocalTime(existing.getCollectionDispatchTime(), command.getCollectionDispatchTime());
+
+        if (timezone == null || timezone.isBlank()) {
+            timezone = "America/Fortaleza";
+        }
+        if (reminderTime == null) {
+            reminderTime = LocalTime.of(9, 0);
+        }
+        if (collectionTime == null) {
+            collectionTime = LocalTime.of(10, 0);
+        }
+
         SystemConfig updated = SystemConfig.builder()
                 .id(existing.getId())
-                .brandName(normalize(command.getBrandName()))
-                .contactEmail(normalize(command.getContactEmail()))
-                .contactPhone(normalize(command.getContactPhone()))
-                .cnpj(normalize(command.getCnpj()))
+                .brandName(resolveUpdatedString(existing.getBrandName(), command.getBrandName()))
+                .contactEmail(resolveUpdatedString(existing.getContactEmail(), command.getContactEmail()))
+                .contactPhone(resolveUpdatedString(existing.getContactPhone(), command.getContactPhone()))
+                .cnpj(resolveUpdatedString(existing.getCnpj(), command.getCnpj()))
+
+                .pixKey(resolveUpdatedString(existing.getPixKey(), command.getPixKey()))
+                .notificationTimezone(timezone)
+                .reminderDispatchTime(reminderTime)
+                .collectionDispatchTime(collectionTime)
                 .logoOriginalFileName(existing.getLogoOriginalFileName())
                 .logoContentType(existing.getLogoContentType())
                 .logoSizeBytes(existing.getLogoSizeBytes())
@@ -52,11 +72,29 @@ public class UpdateSystemConfigUseCaseImpl implements UpdateSystemConfigUseCase 
         return assembler.toResponse(saved);
     }
 
-    private String normalize(String value) {
-        if (value == null) {
+    private String resolveUpdatedString(String existingValue, String incomingValue) {
+        if (incomingValue == null) {
+            return existingValue;
+        }
+        String v = incomingValue.trim();
+        return v.isBlank() ? null : v;
+    }
+
+    private String resolveUpdatedTimezone(String existingValue, String incomingValue) {
+        if (incomingValue == null) {
+            return existingValue;
+        }
+        String v = incomingValue.trim();
+        if (v.isBlank()) {
             return null;
         }
-        String v = value.trim();
-        return v.isBlank() ? null : v;
+        return v;
+    }
+
+    private LocalTime resolveUpdatedLocalTime(LocalTime existingValue, LocalTime incomingValue) {
+        if (incomingValue == null) {
+            return existingValue;
+        }
+        return incomingValue;
     }
 }
